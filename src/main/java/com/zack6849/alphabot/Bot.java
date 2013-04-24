@@ -18,7 +18,8 @@ import org.pircbotx.hooks.events.InviteEvent;
 import org.pircbotx.hooks.events.MessageEvent;
 
 @SuppressWarnings("rawtypes")
-public class Bot extends ListenerAdapter{
+public class Bot extends ListenerAdapter
+{
 
     public static List<String> owners = new ArrayList<String>();
     public static PircBotX bot;
@@ -26,14 +27,19 @@ public class Bot extends ListenerAdapter{
     private static List<String> allowed;
     public static List<String> ignored = new ArrayList<String>();
     public static List<String> users = new ArrayList<String>();
-    public static HashMap<String,Integer> violation = new HashMap<String, Integer>();
+    public static HashMap<String, Integer> violation = new HashMap<String, Integer>();
     public static String curcmd;
-    public static HashMap<Channel,Channel> relay = new HashMap<Channel, Channel>(0);
-    public static void main(String[] args){    
+    public static HashMap<Channel, Channel> relay = new HashMap<Channel, Channel>(0);
+
+    public static void main(String[] args)
+    {
         start();
     }
-    public static void start() {
-        try {
+
+    public static void start()
+    {
+        try
+        {
             bot = new PircBotX();
             Config.loadConfig();
             System.out.println(String.format("=======\nSETTINGS\n======\nBOT-NICKNAME: %s\nBOT-IDENT: %s\nIDENTIFY-WITH-NICKSERV: %s\nVERIFY ADMIN NICKNAMES: %s\nNOTICE IDENTIFIER: %s\nPUBLIC_IDENTIFIER: %s\n======\nSETTINGS\n=======\n\n\n", Config.NICK, Config.IDENT, Config.IDENTIFY_WITH_NICKSERV, Config.VERIFY_ADMIN_NICKS, Config.NOTICE_IDENTIFIER, Config.PUBLIC_IDENTIFIER));
@@ -43,293 +49,379 @@ public class Bot extends ListenerAdapter{
             bot.setFinger("oh god what are you doing");
             bot.setVerbose(Config.DEBUG_MODE);
             bot.connect(Config.SERVER);
-            if(Config.IDENTIFY_WITH_NICKSERV){
-            	 bot.identify(Config.PASSWORD);
+            if (Config.IDENTIFY_WITH_NICKSERV)
+            {
+                bot.identify(Config.PASSWORD);
             }
             allowed = Config.ADMINS;
-            for (String s : Config.CHANS) {
-                bot.joinChannel(s);
-                System.out.println("Joined channel " + s);
+            for (String channel : Config.CHANS)
+            {
+                bot.joinChannel(channel);
+                System.out.println("Joined channel " + channel);
             }
             bot.getListenerManager().addListener(new Bot());
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             e.printStackTrace();
         }
     }
 
     @Override
-    public void onMessage(MessageEvent e) {
-        String command = CheckCommand(e);
+    public void onMessage(MessageEvent event)
+    {
+        String command = CheckCommand(event);
         curcmd = command;
         String title = null;
-        if (!e.getChannel().isOp(e.getUser()) && !e.getChannel().hasVoice(e.getUser())) {
-            checkSpam(e);
+        if (!event.getChannel().isOp(event.getUser()) && !event.getChannel().hasVoice(event.getUser()))
+        {
+            checkSpam(event);
         }
-        if(ignored.contains(e.getUser().getHostmask())){
-    		return;
-    	}
-        String[] words = e.getMessage().split(" ");
-        for (int i = 0; i < words.length; i++) {
-            if (Utils.isUrl(words[i]) && !command.contains("shorten") && !words[i].contains("youtube") && !curcmd.contains("setcmd")) {
-                try {
+        if (ignored.contains(event.getUser().getHostmask()))
+        {
+            return;
+        }
+        String[] words = event.getMessage().split(" ");
+        for (int i = 0; i < words.length; i++)
+        {
+            if (Utils.isUrl(words[i]) && !command.contains("shorten") && !words[i].contains("youtube") && !curcmd.contains("setcmd"))
+            {
+                try
+                {
                     title = Utils.getWebpageTitle(words[i]);
-                    String msg = String.format("%s's url title: %s", e.getUser().getNick(), title);
-                    e.getBot().sendMessage(e.getChannel(), msg);
-                } catch (Exception ex1) {
+                    String msg = String.format("%s's url title: %s", event.getUser().getNick(), title);
+                    event.getBot().sendMessage(event.getChannel(), msg);
+                } catch (Exception ex1)
+                {
                     ex1.printStackTrace();
                 }
 
             }
-            if (Utils.isUrl(words[i]) && !command.contains("shorten") && words[i].toLowerCase().contains("youtube") && !command.equalsIgnoreCase("ping")) {
-                try {
-                    e.getBot().sendMessage(e.getChannel(), e.getUser().getNick() + "'s youtube link: " + Utils.getYoutubeInfo(words[i]));
-                } catch (Exception e1) {
+            if (Utils.isUrl(words[i]) && !command.contains("shorten") && words[i].toLowerCase().contains("youtube") && !command.equalsIgnoreCase("ping"))
+            {
+                try
+                {
+                    event.getBot().sendMessage(event.getChannel(), event.getUser().getNick() + "'s youtube link: " + Utils.getYoutubeInfo(words[i]));
+                } catch (Exception e1)
+                {
                     e1.printStackTrace();
                 }
             }
         }
-        if(relay.containsKey(e.getChannel())){
-        	bot.sendMessage(relay.get(e.getChannel()), "[" + e.getChannel().getName() + "] <" + e.getUser().getNick() + "> " + e.getMessage());
+        if (relay.containsKey(event.getChannel()))
+        {
+            bot.sendMessage(relay.get(event.getChannel()), "[" + event.getChannel().getName() + "] <" + event.getUser().getNick() + "> " + event.getMessage());
         }
-        if (e.getMessage().startsWith(Config.PUBLIC_IDENTIFIER) || e.getMessage().startsWith(Config.NOTICE_IDENTIFIER)) {
-            if (ignored.contains(e.getUser().getHostmask())) {
-                Commands.sendNotice(e.getUser(), "Sorry, you've been ignored by the bot.");
+        if (event.getMessage().startsWith(Config.PUBLIC_IDENTIFIER) || event.getMessage().startsWith(Config.NOTICE_IDENTIFIER))
+        {
+            if (ignored.contains(event.getUser().getHostmask()))
+            {
+                Commands.sendNotice(event.getUser(), "Sorry, you've been ignored by the bot.");
                 return;
             }
-            parseCommands(e);
+            parseCommands(event);
             //System.out.println("Parsing commands!");
-            Commands.getCommand(e);
+            Commands.getCommand(event);
         }
     }
 
-    public void parseCommands(MessageEvent e) {
+    public void parseCommands(MessageEvent event)
+    {
         String command = curcmd;
 
-        if (command.equalsIgnoreCase("cycle")) {
-            Commands.cycle(e);
+        if (command.equalsIgnoreCase("cycle"))
+        {
+            Commands.cycle(event);
         }
-        if(command.equalsIgnoreCase("spam")) {
-        	Commands.spam(e);
+        if (command.equalsIgnoreCase("spam"))
+        {
+            Commands.spam(event);
         }
-        if (command.equalsIgnoreCase("raw")) {
-            Commands.sendRaw(e);
+        if (command.equalsIgnoreCase("raw"))
+        {
+            Commands.sendRaw(event);
         }
-        if(command.equalsIgnoreCase("prefix")){
-        	Commands.setPrefix(e);
+        if (command.equalsIgnoreCase("prefix"))
+        {
+            Commands.setPrefix(event);
         }
-        if (command.equalsIgnoreCase("debug")) {
-            Commands.setDebug(e);
+        if (command.equalsIgnoreCase("debug"))
+        {
+            Commands.setDebug(event);
         }
-        if(command.equalsIgnoreCase("kick")){
-        	Commands.kick(e);
+        if (command.equalsIgnoreCase("kick"))
+        {
+            Commands.kick(event);
         }
-        if (command.equalsIgnoreCase("listops")) {
-            Commands.listOperators(e);
+        if (command.equalsIgnoreCase("listops"))
+        {
+            Commands.listOperators(event);
         }
-        if (command.equalsIgnoreCase("join")) {
-            Commands.joinChannel(e);
+        if (command.equalsIgnoreCase("join"))
+        {
+            Commands.joinChannel(event);
         }
-        if(command.equalsIgnoreCase("exec")){
-        	Commands.execute(e);
+        if (command.equalsIgnoreCase("exec"))
+        {
+            Commands.execute(event);
         }
-        if (command.equalsIgnoreCase("delay")) {
-            Commands.setDelay(e);
+        if (command.equalsIgnoreCase("delay"))
+        {
+            Commands.setDelay(event);
         }
-        if (command.equalsIgnoreCase("reqf")) {
-            Commands.sendFile(e);
+        if (command.equalsIgnoreCase("reqf"))
+        {
+            Commands.sendFile(event);
         }
-        if (command.equalsIgnoreCase("gsay")) {
-            Commands.globalSay(e);
+        if (command.equalsIgnoreCase("gsay"))
+        {
+            Commands.globalSay(event);
         }
-        if (command.equalsIgnoreCase("say")) {
-            Commands.say(e);
+        if (command.equalsIgnoreCase("say"))
+        {
+            Commands.say(event);
         }
-        if (command.equalsIgnoreCase("slap")) {
-            Commands.slap(e);
+        if (command.equalsIgnoreCase("slap"))
+        {
+            Commands.slap(event);
         }
-        if (command.equalsIgnoreCase("part")) {
-            Commands.partChannel(e);
+        if (command.equalsIgnoreCase("part"))
+        {
+            Commands.partChannel(event);
         }
-        if (command.equalsIgnoreCase("eat")) {
-            Commands.eat(e);
+        if (command.equalsIgnoreCase("eat"))
+        {
+            Commands.eat(event);
         }
-        if (command.equalsIgnoreCase("nope")) {
-            Commands.nope(e);
+        if (command.equalsIgnoreCase("nope"))
+        {
+            Commands.nope(event);
         }
-        if (command.equalsIgnoreCase("nick")) {
-            Commands.changeNickName(e);
+        if (command.equalsIgnoreCase("nick"))
+        {
+            Commands.changeNickName(event);
         }
-        if (command.equalsIgnoreCase("chans")) {
-            Commands.listChannels(e);
+        if (command.equalsIgnoreCase("chans"))
+        {
+            Commands.listChannels(event);
         }
-        if (command.equalsIgnoreCase("paid")) {
-            Commands.checkAccount(e);
+        if (command.equalsIgnoreCase("paid"))
+        {
+            Commands.checkAccount(event);
         }
-        if (command.equalsIgnoreCase("mcstatus")) {
-            Commands.checkMojangServers(e);
+        if (command.equalsIgnoreCase("mcstatus"))
+        {
+            Commands.checkMojangServers(event);
         }
-        if(command.equalsIgnoreCase("spy")){
-        	Commands.spy(e);
+        if (command.equalsIgnoreCase("spy"))
+        {
+            Commands.spy(event);
         }
-        if (command.equalsIgnoreCase("google")) {
-            Commands.google(e);
+        if (command.equalsIgnoreCase("query"))
+        {
+            Commands.checkServerStatus(event);
         }
-        if (command.equalsIgnoreCase("query")) {
-            Commands.checkServerStatus(e);
+        if (command.equalsIgnoreCase("kill"))
+        {
+            Commands.kill(event);
         }
-        if (command.equalsIgnoreCase("kill")) {
-            Commands.kill(e);
+        if (command.equalsIgnoreCase("op"))
+        {
+            Commands.op(event);
         }
-        if (command.equalsIgnoreCase("op")) {
-            Commands.op(e);
-        }
-        if (command.equalsIgnoreCase("reload")) {
-            e.getBot().sendMessage(e.getChannel(), "Configuration reloaded!");
-            try {
+        if (command.equalsIgnoreCase("reload"))
+        {
+            event.getBot().sendMessage(event.getChannel(), "Configuration reloaded!");
+            try
+            {
                 Config.reload();
-            } catch (Exception e1) {
+            } catch (Exception e1)
+            {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
             }
         }
-        if (command.equalsIgnoreCase("deop")) {
-            Commands.deop(e);
+        if (command.equalsIgnoreCase("deop"))
+        {
+            Commands.deop(event);
         }
-        if(command.equalsIgnoreCase("ping")){
-        	Commands.ping(e);
+        if (command.equalsIgnoreCase("ping"))
+        {
+            Commands.ping(event);
         }
-        if (command.equalsIgnoreCase("voice")) {
-            Commands.voice(e);
+        if (command.equalsIgnoreCase("voice"))
+        {
+            Commands.voice(event);
         }
-        if (command.equalsIgnoreCase("devoice")) {
-            Commands.deVoice(e);
+        if (command.equalsIgnoreCase("devoice"))
+        {
+            Commands.deVoice(event);
         }
-        if (command.equalsIgnoreCase("quiet")) {
-            Commands.quiet(e);
+        if (command.equalsIgnoreCase("quiet"))
+        {
+            Commands.quiet(event);
         }
-        if (command.equalsIgnoreCase("unquiet")) {
-            Commands.unquiet(e);
+        if (command.equalsIgnoreCase("unquiet"))
+        {
+            Commands.unquiet(event);
         }
-        if (command.equalsIgnoreCase("stack")) {
+        if (command.equalsIgnoreCase("stack"))
+        {
             //
         }
-        if (command.equalsIgnoreCase("login")) {
-            Commands.login(e);
+        if (command.equalsIgnoreCase("login"))
+        {
+            Commands.login(event);
         }
-        if (command.equalsIgnoreCase("ignore")) {
-            Commands.ignore(e);
+        if (command.equalsIgnoreCase("ignore"))
+        {
+            Commands.ignore(event);
         }
-        if (command.equalsIgnoreCase("unignore")) {
-            Commands.unignore(e);
+        if (command.equalsIgnoreCase("unignore"))
+        {
+            Commands.unignore(event);
         }
-        if (command.equalsIgnoreCase("shorten")) {
-            Commands.shortenUrl(e);
+        if (command.equalsIgnoreCase("shorten"))
+        {
+            Commands.shortenUrl(event);
         }
-        if (command.equalsIgnoreCase("setcmd")) {
-            Commands.setCommand(e);
+        if (command.equalsIgnoreCase("setcmd"))
+        {
+            Commands.setCommand(event);
         }
-        if (command.equalsIgnoreCase("invalid")) {
-            e.respond("Invalid command!");
+        if (command.equalsIgnoreCase("invalid"))
+        {
+            event.respond("Invalid command!");
         }
-        if (command.equalsIgnoreCase("admin")) {
-            try {
-                Commands.addOwner(e);
-            } catch (Exception e1) {
+        if (command.equalsIgnoreCase("admin"))
+        {
+            try
+            {
+                Commands.addOwner(event);
+            } catch (Exception e1)
+            {
                 e1.printStackTrace();
             }
         }
-        if (command.equalsIgnoreCase("listfiles")) {
-            Commands.listFiles(e);
+        if (command.equalsIgnoreCase("listfiles"))
+        {
+            Commands.listFiles(event);
         }
-        if (command.equalsIgnoreCase("sha")) {
-            Commands.encrypt(e);
+        if (command.equalsIgnoreCase("sha"))
+        {
+            Commands.encrypt(event);
         }
-        if (command.equalsIgnoreCase("delcmd")) {
-            Commands.deleteCommand(e);
+        if (command.equalsIgnoreCase("delcmd"))
+        {
+            Commands.deleteCommand(event);
         }
 
     }
 
-    public String CheckCommand(MessageEvent e) {
-        String[] args = e.getMessage().split(" ");
-        if(args.length == 0){
-        	return "invalid";
+    public String CheckCommand(MessageEvent event)
+    {
+        String[] args = event.getMessage().split(" ");
+        if (args.length == 0)
+        {
+            return "invalid";
         }
         String cmd1 = args[0].substring(1);
         return cmd1;
     }
-	public static String findUrl(MessageEvent e) throws MalformedURLException, IOException{
-		String msg = null;
-		String title = null;
-		String[] words = e.getMessage().split(" ");
-		for(int i = 0; i < words.length; i++){
-			if(Utils.isUrl(words[i])){
-				title = Utils.getWebpageTitle(words[i]);
-			}
-		}
-		msg = String.format("%s's url title: %s", e.getUser().getNick(), title);
-		return msg;
-	}
 
-    public static List<String> getAccessList() {
+    public static String findUrl(MessageEvent event) throws MalformedURLException, IOException
+    {
+        String msg = null;
+        String title = null;
+        String[] words = event.getMessage().split(" ");
+        for (int i = 0; i < words.length; i++)
+        {
+            if (Utils.isUrl(words[i]))
+            {
+                title = Utils.getWebpageTitle(words[i]);
+            }
+        }
+        msg = String.format("%s's url title: %s", event.getUser().getNick(), title);
+        return msg;
+    }
+
+    public static List<String> getAccessList()
+    {
         return allowed;
     }
-    public static void refreshAcessList() {
-        try {
+
+    public static void refreshAcessList()
+    {
+        try
+        {
             allowed.clear();
-            URL u;
-            u = new URL("https://dl.dropbox.com/u/49928817/bot_users.txt");
-            BufferedReader b = new BufferedReader(new InputStreamReader(u.openConnection().getInputStream()));
+            URL url;
+            url = new URL("https://dl.dropbox.com/u/49928817/bot_users.txt");
+            BufferedReader b = new BufferedReader(new InputStreamReader(url.openConnection().getInputStream()));
             String[] names = b.readLine().toLowerCase().split(" ");
             b.close();
             allowed.addAll(Arrays.asList(names));
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             User u = bot.getUser("zack6849");
             bot.sendNotice(u, "Error whilst fetching acess list! " + e.getCause() + " " + e.getMessage());
         }
     }
+
     @Override
-	public void onInvite(InviteEvent e){
-    	if(Config.ACCEPT_INVITES){
-    		e.getBot().joinChannel(e.getChannel());
-    	}
+    public void onInvite(InviteEvent event)
+    {
+        if (Config.ACCEPT_INVITES)
+        {
+            event.getBot().joinChannel(event.getChannel());
+        }
     }
-    public void checkSpam(final MessageEvent e){
-    	new Thread(new Runnable(){
-    		@Override
-    		public void run(){
-    			//System.out.println("entered run");
-    			try{
-    				if(!users.contains(e.getUser().getNick())){
-    					if(violation.containsKey(e.getUser().getNick())){
-    						violation.put(e.getUser().getNick(), (Integer) violation.get(e.getUser().getNick()) + 1);
-    					}else{
-    						violation.put(e.getUser().getNick(), 0);
-    					}
-    					users.add(e.getUser().getNick());
-    					//System.out.println("Added to list.");
-    					Thread.sleep(750);
-    					//System.out.println("Removed from list.");
-    					users.remove(e.getUser().getNick());
-    				}else{
-    					if((Integer) violation.get(e.getUser().getNick()) > 3){
-    						e.getBot().kick(e.getChannel(), e.getUser(), "Too much spam bro.");
-    						violation.put(e.getUser().getNick(), 0);
-    						return;
-    					}
-    					//System.out.println("User already in list. muting");	
-    					e.getBot().setMode(e.getChannel(), "+q ", e.getUser());
-    					users.remove(e.getUser().getNick());
-    					//System.out.println("muted.");
-    					Utils.sendNotice(e.getUser(), "You've been muted temporarily for spam.");
-    					Thread.sleep(1000 * 10);
-    					//System.out.println("unmuted");
-    					e.getBot().setMode(e.getChannel(), "-q ", e.getUser());
-    				}
-    			}catch(Exception e){
-    				e.printStackTrace();
-    			}
-    		}
-    	}).start();
+
+    public void checkSpam(final MessageEvent event)
+    {
+        new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                //System.out.println("entered run");
+                try
+                {
+                    if (!users.contains(event.getUser().getNick()))
+                    {
+                        if (violation.containsKey(event.getUser().getNick()))
+                        {
+                            violation.put(event.getUser().getNick(), (Integer) violation.get(event.getUser().getNick()) + 1);
+                        } else
+                        {
+                            violation.put(event.getUser().getNick(), 0);
+                        }
+                        users.add(event.getUser().getNick());
+                        //System.out.println("Added to list.");
+                        Thread.sleep(750);
+                        //System.out.println("Removed from list.");
+                        users.remove(event.getUser().getNick());
+                    } else
+                    {
+                        if ((Integer) violation.get(event.getUser().getNick()) > 3)
+                        {
+                            event.getBot().kick(event.getChannel(), event.getUser(), "Too much spam bro.");
+                            violation.put(event.getUser().getNick(), 0);
+                            return;
+                        }
+                        //System.out.println("User already in list. muting");
+                        event.getBot().setMode(event.getChannel(), "+q ", event.getUser());
+                        users.remove(event.getUser().getNick());
+                        //System.out.println("muted.");
+                        Utils.sendNotice(event.getUser(), "You've been muted temporarily for spam.");
+                        Thread.sleep(1000 * 10);
+                        //System.out.println("unmuted");
+                        event.getBot().setMode(event.getChannel(), "-q ", event.getUser());
+                    }
+                } catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 }
