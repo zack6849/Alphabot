@@ -15,10 +15,10 @@ Any value defined here will override the pom.xml file value but is only applicab
 -->
         <org-netbeans-modules-editor-indent.CodeStyle.usedProfile>project</org-netbeans-modules-editor-indent.CodeStyle.usedProfile>
         <org-netbeans-modules-editor-indent.CodeStyle.project.spaces-per-tab>2</org-netbeans-modules-editor-indent.CodeStyle.project.spaces-per-tab>
-        <org-netbeans-modules-editor-indent.CodeStyle.project.tab-size>2</org-netbeans-modules-editor-indent.CodeStyle.project.tab-size>
+        <org-netbeans-modules-editor-indent.CodeStyle.project.tab-size>4</org-netbeans-modules-editor-indent.CodeStyle.project.tab-size>
         <org-netbeans-modules-editor-indent.CodeStyle.project.indent-shift-width>2</org-netbeans-modules-editor-indent.CodeStyle.project.indent-shift-width>
         <org-netbeans-modules-editor-indent.CodeStyle.project.expand-tabs>true</org-netbeans-modules-editor-indent.CodeStyle.project.expand-tabs>
-        <org-netbeans-modules-editor-indent.CodeStyle.project.text-limit-width>120</org-netbeans-modules-editor-indent.CodeStyle.project.text-limit-width>
+        <org-netbeans-modules-editor-indent.CodeStyle.project.text-limit-width>80</org-netbeans-modules-editor-indent.CodeStyle.project.text-limit-width>
         <org-netbeans-modules-editor-indent.CodeStyle.project.text-line-wrap>none</org-netbeans-modules-editor-indent.CodeStyle.project.text-line-wrap>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.blankLinesAfterClassHeader>0</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.blankLinesAfterClassHeader>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.alignMultilineAssignment>true</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.alignMultilineAssignment>
@@ -36,19 +36,17 @@ Any value defined here will override the pom.xml file value but is only applicab
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.spaceAfterTypeCast>false</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.spaceAfterTypeCast>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.placeFinallyOnNewLine>true</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.placeFinallyOnNewLine>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.placeCatchOnNewLine>true</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.placeCatchOnNewLine>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.classDeclBracePlacement>NEW_LINE</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.classDeclBracePlacement>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.alignMultilineAnnotationArgs>true</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.alignMultilineAnnotationArgs>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.indentCasesFromSwitch>false</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.indentCasesFromSwitch>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.placeWhileOnNewLine>true</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.placeWhileOnNewLine>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.indent-shift-width>4</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.indent-shift-width>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.alignMultilineTryResources>true</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.alignMultilineTryResources>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.alignMultilineFor>true</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.alignMultilineFor>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.alignMultilineMethodParams>true</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.alignMultilineMethodParams>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.blankLinesBeforeClass>2</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.blankLinesBeforeClass>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.tab-size>4</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.tab-size>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.otherBracePlacement>NEW_LINE</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.otherBracePlacement>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.expand-tabs>false</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.expand-tabs>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.methodDeclBracePlacement>NEW_LINE</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.methodDeclBracePlacement>
+        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.tab-size>8</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.tab-size>
+        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.expand-tabs>true</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.expand-tabs>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.importGroupsOrder>*</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.importGroupsOrder>
+        <netbeans.checkstyle.format>true</netbeans.checkstyle.format>
+        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.text-line-wrap>none</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.text-line-wrap>
     </properties>
 </project-shared-configuration>
