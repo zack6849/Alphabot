@@ -61,7 +61,7 @@ public class Commands {
                 myList.add(user.getNick());
             }
             String f1 = myList.toString().replaceAll("[\\['']|['\\]'']", "");
-            sendNotice(event.getUser(), "The current channel operators are " + f1);
+           Utils.sendNotice(event.getUser(), "The current channel operators are " + f1);
         }
     }
 
@@ -84,10 +84,10 @@ public class Commands {
         if (args.length == 2) {
             if (StringUtils.isNumeric(args[1])) {
                 event.getBot().setMessageDelay(Integer.valueOf(args[1]));
-                sendNotice(event.getUser(), "Message delay set to " + Integer.valueOf(args[1]) + " milliseconds!");
+               Utils.sendNotice(event.getUser(), "Message delay set to " + Integer.valueOf(args[1]) + " milliseconds!");
             }
             else {
-                sendNotice(event.getUser(), "The argument " + args[1] + " is not a number!");
+               Utils.sendNotice(event.getUser(), "The argument " + args[1] + " is not a number!");
             }
         }
     }
@@ -166,7 +166,7 @@ public class Commands {
             event.getBot().sendMessage(channel, all);
         }
         else {
-            sendNotice(event.getUser(), "Usage: " + Bot.prefix + "GSAY #CHANNEL MESSAGE");
+           Utils.sendNotice(event.getUser(), "Usage: " + Bot.prefix + "GSAY #CHANNEL MESSAGE");
         }
     }
 
@@ -177,7 +177,7 @@ public class Commands {
             e.getBot().sendAction(e.getChannel(), "slaps " + t.getNick() + " around a bit with a stack trace");
         }
         else {
-            sendNotice(e.getUser(), "Usage: " + Bot.prefix + "slap <username>");
+           Utils.sendNotice(e.getUser(), "Usage: " + Bot.prefix + "slap <username>");
         }
     }
 
@@ -237,10 +237,10 @@ public class Commands {
         if (event.getChannel().getVoices().contains(event.getUser()) || event.getChannel().getOps().contains(event.getUser()) || Utils.isAdmin(event.getUser().getNick())) {
             if (args.length == 2) {
                 Config.PUBLIC_IDENTIFIER = args[1];
-                sendNotice(event.getUser(), event.getBot().getNick() + "' prefix was set to :" + Bot.prefix);
+               Utils.sendNotice(event.getUser(), event.getBot().getNick() + "' prefix was set to :" + Bot.prefix);
             }
             else {
-                sendNotice(event.getUser(), "Usage: $Bot prefix <new Bot prefix>");
+               Utils.sendNotice(event.getUser(), "Usage: $Bot prefix <new Bot prefix>");
             }
         }
         else {
@@ -326,15 +326,15 @@ public class Commands {
                 while ((st = re.readLine()) != null) {
                     String a = st.replace("red", Colors.RED + "Offline" + Colors.NORMAL).replace("green", Colors.GREEN + "Online" + Colors.NORMAL).replace("[", "").replace("]", "");
                     String b = a.replace("{", "").replace("}", "").replace(":", " is currently ").replace("\"", "").replaceAll(",", ", ");
-                    sendNotice(event.getUser(), b);
+                   Utils.sendNotice(event.getUser(), b);
                 }
             }
             catch (IOException E) {
                 if (E.getMessage().contains("503")) {
-                    sendNotice(event.getUser(), "The minecraft status server is temporarily unavailable, please try again later");
+                   Utils.sendNotice(event.getUser(), "The minecraft status server is temporarily unavailable, please try again later");
                 }
                 if (E.getMessage().contains("404")) {
-                    sendNotice(event.getUser(), "Uhoh, it would appear as if the haspaid page has been removed or relocated >_>");
+                   Utils.sendNotice(event.getUser(), "Uhoh, it would appear as if the haspaid page has been removed or relocated >_>");
                 }
             }
         }
@@ -509,10 +509,6 @@ public class Commands {
         }
     }
 
-    public static void sendNotice(User user, String notice) {
-        Bot.bot.sendNotice(user, notice);
-    }
-
     public static void ignore(MessageEvent event) {
         String[] args = event.getMessage().split(" ");
         if (Utils.isAdmin(event.getUser().getNick())) {
@@ -527,11 +523,11 @@ public class Commands {
                 }
             }
             else {
-                sendNotice(event.getUser(), "usage: $ignore user");
+               Utils.sendNotice(event.getUser(), "usage: $ignore user");
             }
         }
         else {
-            sendNotice(event.getUser(), Commands.perms);
+           Utils.sendNotice(event.getUser(), Commands.perms);
         }
     }
 
@@ -548,11 +544,11 @@ public class Commands {
                 }
             }
             else {
-                sendNotice(event.getUser(), "usage: $unignore user");
+               Utils.sendNotice(event.getUser(), "usage: $unignore user");
             }
         }
         else {
-            sendNotice(event.getUser(), Commands.perms);
+           Utils.sendNotice(event.getUser(), Commands.perms);
         }
     }
 
@@ -579,7 +575,7 @@ public class Commands {
             }
         }
         else {
-            sendNotice(e.getUser(), perms);
+           Utils.sendNotice(e.getUser(), perms);
         }
     }
 
@@ -606,7 +602,7 @@ public class Commands {
             }
         }
         else {
-            sendNotice(e.getUser(), perms);
+           Utils.sendNotice(e.getUser(), perms);
         }
     }
 
