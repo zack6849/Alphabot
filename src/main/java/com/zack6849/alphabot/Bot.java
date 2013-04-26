@@ -99,7 +99,7 @@ public class Bot extends ListenerAdapter {
         }
         if (event.getMessage().startsWith(Config.PUBLIC_IDENTIFIER) || event.getMessage().startsWith(Config.NOTICE_IDENTIFIER)) {
             if (ignored.contains(event.getUser().getHostmask())) {
-                Commands.sendNotice(event.getUser(), "Sorry, you've been ignored by the bot.");
+                utils.sendNotice(event.getUser(), "Sorry, you've been ignored by the bot.");
                 return;
             }
             parseCommands(event);
