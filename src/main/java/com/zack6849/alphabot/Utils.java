@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -53,14 +54,10 @@ public class Utils {
             return false;
         }
     }
-
-    public static String htmlFormat(String s) {
-        System.out.println(String.valueOf(new File("c:/").exists()));
-        return s.replaceAll("<b>", "").replace("</b>", "").replace("&#39;", "'").replaceAll("&quot;", "'").replaceAll("   ", " ").replaceAll("&amp;", "&");
-    }
-
+    //if you do need to html format, use StringEscapeUtils.unescapeHtml()
     public static String removeBrackets(String s) {
         return s.replaceAll("[\\['']|['\\]'']", "");
+        
     }
 
     /**

@@ -558,10 +558,6 @@ public class Commands {
             if (arguments.length == 2) {
                 if (!Utils.isAdmin(arguments[1])) {
                     Config.ADMINS.add(arguments[1]);
-                    String admins = "";
-                    for (String s : Config.ADMINS) {
-                        admins += s + " ";
-                    }
                     Config.reload();
                     Config.getConfig().refresh();
                     Utils.sendNotice(e.getUser(), arguments[1] + " is now an administrator. reloaded the configuration.");

@@ -3,6 +3,7 @@ package com.zack6849.alphabot;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -31,6 +32,7 @@ public class Config {
     public static String[] CHANS;
     public static List<String> ADMINS;
     public static List<String> EXEC_ADMINS;
+    public static List<String> LOGGED_CHANS;
 
     public static void loadConfig() throws ConfigurationException, IOException {
         conf = new PropertiesConfiguration(cnf);
@@ -69,6 +71,7 @@ public class Config {
             conf.setProperty("NOT-ADMIN", "Sorry, you are either not on the admins list or are not logged in as an admin.");
             conf.setProperty("DEBUG-MODE", true);
             conf.setProperty("ACCEPT-INVITIATIONS", true);
+            conf.setProperty("LOGGED-CHANNELS","#alphacraft #alphabot");
             conf.save();
         }
         ADMINS = new ArrayList<String>();
@@ -86,12 +89,9 @@ public class Config {
         NOTICE_IDENTIFIER = conf.getString("NOTICE-IDENTIFIER");
         PUBLIC_IDENTIFIER = conf.getString("PUBLIC-IDENTIFIER");
         CHANS = conf.getString("CHANNELS").split(" ");
-        for (String user : conf.getString("BOT-ADMINS").split(" ")) {
-            ADMINS.add(user);
-        }
-        for (String user : conf.getString("EXEC-ADMINS").split(" ")) {
-            EXEC_ADMINS.add(user);
-        }
+        ADMINS = Arrays.asList(conf.getString("BOT-ADMINS").split(" "));
+        EXEC_ADMINS = Arrays.asList(conf.getString("EXEC-ADMINS").split(" "));
+        //LOGGED_CHANS = Arrays.asList(conf.getString("LOGGED-CHANNELS").split(" "));
         SERVER = conf.getString("SERVER");
         ACCEPT_INVITES = conf.getBoolean("ACCEPT-INVITIATIONS");
     }
@@ -112,17 +112,13 @@ public class Config {
             conf.setProperty("BOT-REALNAME", Config.REALNAME);
             conf.setProperty("IDENTIFY-WITH-NICKSERV", Config.IDENTIFY_WITH_NICKSERV);
             conf.setProperty("NICKSERV-PASS", Config.PASSWORD);
-            String tmp = "";
-            for (int i = 0; i < CHANS.length; i++) {
-                tmp += CHANS[i] + " ";
-            }
-            conf.setProperty("CHANNELS", tmp);
+            conf.setProperty("CHANNELS", Utils.removeBrackets(Arrays.toString(CHANS)).replaceAll(",", ""));
             conf.setProperty("VERIFY-BOT-ADMINS", Config.VERIFY_ADMIN_NICKS);
             String temp = "";
             for (String s : ADMINS) {
                 temp += s + " ";
             }
-            conf.setProperty("BOT-ADMINS", temp.trim());
+            conf.setProperty("BOT-ADMINS", Utils.removeBrackets(ADMINS.toString()).replaceAll(",", ""));
             temp = "";
             for (String s : EXEC_ADMINS) {
                 temp += s + " ";
@@ -133,6 +129,7 @@ public class Config {
             conf.setProperty("PUBLIC-IDENTIFIER", Config.PUBLIC_IDENTIFIER);
             conf.setProperty("NOTICE-IDENTIFIER", Config.NOTICE_IDENTIFIER);
             conf.setProperty("PERMISSIONS-DENIED", Config.PERMISSIONS_DENIED);
+            
             conf.setProperty("NOT-ADMIN", Config.NOT_ADMIN);
             conf.setProperty("DEBUG-MODE", Config.DEBUG_MODE);
             conf.setProperty("ACCEPT-INVITIATIONS", Config.ACCEPT_INVITES);
