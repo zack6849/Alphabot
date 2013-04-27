@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -45,7 +44,7 @@ public class Utils {
     public static void sendNotice(User user, String notice) {
         Bot.bot.sendNotice(user, notice);
     }
-
+        
     public static boolean isAdmin(String user) {
         if (Config.ADMINS.contains(user) && Bot.bot.getUser(user).isVerified()) {
             return true;
@@ -216,39 +215,36 @@ public class Utils {
     }
 
     public static String getYoutubeInfo(String s) throws IOException {
-        String info;
-        String title = null;
-        String likes = null;
-        String dislikes = null;
-        String user = null;
-        String veiws = null;
-        String publishdate;
+        String user = "";
         Document doc = Jsoup.connect(s).userAgent("Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.57 Safari/537.17").get();
         for (Element e : doc.select("a")) {
             if (e.attr("class").equalsIgnoreCase("yt-uix-sessionlink yt-user-videos")) {
                 user = e.attr("href").split("/user/")[1].split("/")[0];
             }
         }
+        StringBuilder sb = new StringBuilder();
         for (Element e : doc.select("span")) {
+            if (e.attr("class").equalsIgnoreCase("watch-title  yt-uix-expander-head") || e.attr("class").equalsIgnoreCase("watch-title long-title yt-uix-expander-head")) {
+                sb.append("  title: ").append(e.text());
+            }
             if (e.attr("class").equalsIgnoreCase("watch-view-count")) {
-                veiws = e.text();
+                sb.append("  veiws: ").append(e.text());
             }
             if (e.attr("class").equalsIgnoreCase("likes-count")) {
-                likes = e.text();
+                sb.append("  likes: ").append(e.text());
             }
             if (e.attr("class").equalsIgnoreCase("dislikes-count")) {
-                dislikes = e.text();
-            }
-            if (e.attr("class").equalsIgnoreCase("watch-title  yt-uix-expander-head") || e.attr("class").equalsIgnoreCase("watch-title long-title yt-uix-expander-head")) {
-                title = e.text();
+                sb.append("  dislikes: ").append(e.text());
             }
             if (e.attr("class").equalsIgnoreCase("watch-video-date")) {
-                publishdate = e.text();
+                sb.append("  date: ").append(e.text());
             }
         }
-        info = title + " - " + user + "    veiws: " + veiws + "  likes: " + likes + "  dislikes: " + dislikes;
-        //System.out.println(info);
-        return info;
+        if(user == null){
+            return null;
+        } else {
+            return user + sb.toString();
+        }
     }
 
     public static String getWebpageTitle(String s) {
@@ -312,8 +308,8 @@ public class Utils {
     }
 
     public static String ping(String host, int port) {
-        String returns = "";
-        Long time = Long.valueOf("0");
+        String returns;
+        Long time;
         try {
             Long start = System.currentTimeMillis();
             Socket socket = new Socket(InetAddress.getByName(host), port);
