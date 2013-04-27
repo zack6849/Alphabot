@@ -85,7 +85,8 @@ public class Bot extends ListenerAdapter {
                 }
 
             }
-            if (Utils.isUrl(words[i]) && !command.contains("shorten") && words[i].toLowerCase().contains("youtube") && !command.equalsIgnoreCase("ping")) {
+            
+            if (Utils.isUrl(words[i]) && !command.contains("shorten") && (words[i].toLowerCase().contains("/youtu.be") || words[i].toLowerCase().contains(".youtube.com") || words[i].toLowerCase().contains(".youtu.be") || words[i].toLowerCase().contains("/youtube.com") || words[i].toLowerCase().startsWith("youtube.com") || words[i].toLowerCase().startsWith("youtu.be")) && !command.equalsIgnoreCase("ping")) {
                 try {
                     event.getBot().sendMessage(event.getChannel(), event.getUser().getNick() + "'s youtube link: " + Utils.getYoutubeInfo(words[i]));
                 }
@@ -99,7 +100,7 @@ public class Bot extends ListenerAdapter {
         }
         if (event.getMessage().startsWith(Config.PUBLIC_IDENTIFIER) || event.getMessage().startsWith(Config.NOTICE_IDENTIFIER)) {
             if (ignored.contains(event.getUser().getHostmask())) {
-                utils.sendNotice(event.getUser(), "Sorry, you've been ignored by the bot.");
+                Utils.sendNotice(event.getUser(), "Sorry, you've been ignored by the bot.");
                 return;
             }
             parseCommands(event);
