@@ -11,7 +11,7 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 public class Config {
     private static PropertiesConfiguration conf;
     public static PropertiesConfiguration customcmd;
-    public static String CURRENT_DIR = "irc/conf/";
+    public static String CURRENT_DIR = "conf/";
     public static File cnf = new File(CURRENT_DIR + "/config.yml");
     public static File cmd = new File(CURRENT_DIR + "/custom-commands.yml");
     public static boolean IDENTIFY_WITH_NICKSERV;
