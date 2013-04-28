@@ -18,6 +18,8 @@ import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -47,12 +49,7 @@ public class Utils {
     }
         
     public static boolean isAdmin(String user) {
-        if (Config.ADMINS.contains(user) && Bot.bot.getUser(user).isVerified()) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return Config.ADMINS.contains(Utils.getAccount(user));
     }
     //if you do need to html format, use StringEscapeUtils.unescapeHtml()
     public static String removeBrackets(String s) {
@@ -81,21 +78,49 @@ public class Utils {
         return paid;
     }
 
-    public static String getAccount(User user) {
-        String returns = "";
-        try {
-            Bot.bot.sendRawLine("WHOIS " + user.getNick() + " " + user.getNick());
-            WhoisEvent event = Bot.bot.waitFor(WhoisEvent.class);
-            String tmp = event.getRegisteredAs();
-            if (tmp != null) {
-                returns = tmp;
+    public static final HashMap<String, String> userNickServMap = new HashMap<String, String>();
+    public static HashMap<String, Object> userLockMap = new HashMap<String, Object>();
+    public static String getAccount (User user)
+    {
+        return getAccount(user.getNick());
+    }
+    /*
+     * All of the wizardy with nickserv caching and logging was done by kingrunes
+     */
+    public static String getAccount(String user) {
+        synchronized (userNickServMap) //To prevent two threads modifying the list at the same time and causing errors
+        {
+            if (userLockMap.containsKey(user))
+                synchronized (userLockMap.get(user)){;}
+            if (!userNickServMap.containsKey(user))
+            {
+                if (!userLockMap.containsKey(user))
+                    userLockMap.put(user, new Object());
+                synchronized (userLockMap.get(user))
+                {
+                    Bot.bot.sendRawLine("WHO " + user + " %na");
+
+                    int loopCount = 0;
+                    while (loopCount < 500 && !userNickServMap.containsKey(user)) //Checks to see if the loop has been ran 500 times (5 / (1/10) seconds) otherwise if the user isn't in the map, loop again
+                        try
+                        {
+                            loopCount++;
+                            Thread.sleep(100);
+                        }
+                        catch (Exception e)
+                        {} // Something weird happened, oh well
+                    userLockMap.remove(user);
+                    if (userNickServMap.containsKey(user))
+                        return userNickServMap.get(user);
+                    else
+                        return null;
+                }
+            }
+            else
+            {
+                return userNickServMap.get(user);
             }
         }
-        catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return returns;
     }
 
     public static List getChannels(User user) {
@@ -318,5 +343,16 @@ public class Utils {
             returns = ex.toString();
         }
         return returns;
+    }
+    public static String getTime() {
+        return String.format("[%tm/%<td/%<ty - %<tH:%<tM:%<tS]", new Date());
+    }
+
+    public static String getMonth() {
+        return String.format("%tB", new Date());
+    }
+
+    public static String getDay() {
+        return String.format("%td", new Date());
     }
 }

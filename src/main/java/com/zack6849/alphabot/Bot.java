@@ -1,6 +1,9 @@
 package com.zack6849.alphabot;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
@@ -13,10 +16,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
-import org.pircbotx.User;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.InviteEvent;
+import org.pircbotx.hooks.events.KickEvent;
 import org.pircbotx.hooks.events.MessageEvent;
+import org.pircbotx.hooks.events.NickChangeEvent;
+import org.pircbotx.hooks.events.PartEvent;
+import org.pircbotx.hooks.events.QuitEvent;
+import org.pircbotx.hooks.events.ServerResponseEvent;
 
 
 @SuppressWarnings("rawtypes")
@@ -47,7 +54,7 @@ public class Bot extends ListenerAdapter {
             bot.setVerbose(Config.DEBUG_MODE);
             bot.connect(Config.SERVER);
             if (Config.IDENTIFY_WITH_NICKSERV) {
-                bot.identify(Config.PASSWORD);
+                bot.identify(Config.NICK + " " + Config.PASSWORD);
             }
             allowed = Config.ADMINS;
             for (String channel : Config.CHANS) {
@@ -62,8 +69,68 @@ public class Bot extends ListenerAdapter {
     }
 
     @Override
+    public synchronized void onServerResponse(ServerResponseEvent event)
+    {
+        if (event.getCode() == 354) // I think, it's been a while
+        {
+            String response = event.getResponse();
+            String[] sResponse = response.split(" ");
+            if (sResponse.length != 3)
+                return;
+            String nick = sResponse[1];
+            String nickserv = sResponse[2];
+            Utils.userNickServMap.put(nick, nickserv);
+        }
+    }
+    
+    @Override
+    public synchronized void onKick(KickEvent event)
+    {
+        synchronized (Utils.userNickServMap)
+        {
+            if (Utils.userNickServMap.containsKey(event.getRecipient().getNick()))
+                Utils.userNickServMap.remove(event.getRecipient().getNick());
+        }
+    }
+    
+    @Override
+    public void onPart(PartEvent event)
+    {
+        synchronized (Utils.userNickServMap)
+        {
+            if (Utils.userNickServMap.containsKey(event.getUser().getNick()))
+                Utils.userNickServMap.remove(event.getUser().getNick());
+        }
+    }
+    
+    @Override
+    public void onQuit(QuitEvent event)
+    {
+        synchronized (Utils.userNickServMap)
+        {
+            if (Utils.userNickServMap.containsKey(event.getUser().getNick()))
+                Utils.userNickServMap.remove(event.getUser().getNick());
+        }
+    }
+    
+    @Override
+    public void onNickChange(NickChangeEvent event)
+    {
+        synchronized (Utils.userNickServMap)
+        {
+            if (Utils.userNickServMap.containsKey(event.getUser().getNick()))
+                Utils.userNickServMap.remove(event.getUser().getNick());
+        }
+    }
+    
+    @Override
     public void onMessage(MessageEvent event) {
         String command = CheckCommand(event);
+        if(Config.LOGGED_CHANS.contains(event.getChannel().getName())){
+              String message = String.format("%s %s: %s", Utils.getTime(), event.getUser().getNick(), event.getMessage());
+              log(event.getChannel().getName(), message);
+              System.out.println("Logging " + message);
+        }
         curcmd = command;
         String title;
         if (!event.getChannel().isOp(event.getUser()) && !event.getChannel().hasVoice(event.getUser())) {
@@ -324,5 +391,63 @@ public class Bot extends ListenerAdapter {
                 }
             }
         }).start();
+    }
+    
+    public static HashMap<String, BufferedWriter> fileWriterMap = new HashMap<String, BufferedWriter>();
+    
+    static
+    {
+        // Register a listener so when the VM shutdowns down we close files to prevent resource leaks
+        Runtime.getRuntime().addShutdownHook(new Thread(new FileCloseThread()));
+    }
+    
+    private static class FileCloseThread implements Runnable
+    {
+        @Override
+        public void run()
+        {
+            // Loop through the values of the hashmap closing the BufferedWriters
+            for (BufferedWriter bw : fileWriterMap.values())
+                try
+                {
+                    bw.close();
+                }
+                catch (Exception e)
+                {
+                    //Already closed
+                }
+        }
+    }
+    
+    public static BufferedWriter getOrCreateNewBW(String fileName) throws IOException
+    {
+        BufferedWriter bw = fileWriterMap.get(fileName);
+        if (bw == null)
+        {
+            File f = new File(fileName);
+            if(!f.exists()){
+                f.getParentFile().mkdirs();
+            }
+            // Let me check in eclipse, netbeans doesn't have that good java doc stuff
+            bw = new BufferedWriter(new FileWriter(f, true));
+            fileWriterMap.put(fileName, bw);
+        }
+        
+        return bw;
+    }
+    
+    public static synchronized void log(String channel, String message){
+        FileWriter fw = null;
+        try {
+            String file = "logs/" + channel + "/" + Utils.getMonth() + "/" + Utils.getDay() + ".txt";
+            
+            BufferedWriter bw = getOrCreateNewBW(file);
+            bw.write(message);
+            bw.newLine();
+            bw.flush();//test again?
+        }
+        catch (IOException ex) {
+            Logger.getLogger(Bot.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

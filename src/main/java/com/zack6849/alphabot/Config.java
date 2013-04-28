@@ -91,7 +91,7 @@ public class Config {
         CHANS = conf.getString("CHANNELS").split(" ");
         ADMINS = Arrays.asList(conf.getString("BOT-ADMINS").split(" "));
         EXEC_ADMINS = Arrays.asList(conf.getString("EXEC-ADMINS").split(" "));
-        //LOGGED_CHANS = Arrays.asList(conf.getString("LOGGED-CHANNELS").split(" "));
+        LOGGED_CHANS = Arrays.asList(conf.getString("LOGGED-CHANNELS").split(" "));
         SERVER = conf.getString("SERVER");
         ACCEPT_INVITES = conf.getBoolean("ACCEPT-INVITIATIONS");
     }
@@ -114,25 +114,16 @@ public class Config {
             conf.setProperty("NICKSERV-PASS", Config.PASSWORD);
             conf.setProperty("CHANNELS", Utils.removeBrackets(Arrays.toString(CHANS)).replaceAll(",", ""));
             conf.setProperty("VERIFY-BOT-ADMINS", Config.VERIFY_ADMIN_NICKS);
-            String temp = "";
-            for (String s : ADMINS) {
-                temp += s + " ";
-            }
             conf.setProperty("BOT-ADMINS", Utils.removeBrackets(ADMINS.toString()).replaceAll(",", ""));
-            temp = "";
-            for (String s : EXEC_ADMINS) {
-                temp += s + " ";
-            }
-            conf.setProperty("EXEC-ADMINS", temp.trim());
-            conf.setProperty("EXEC-ADMINS", temp.trim());
+            conf.setProperty("EXEC-ADMINS", Utils.removeBrackets(EXEC_ADMINS.toString()).replaceAll(",", ""));
             conf.setProperty("ALLOW-FILE-TRANSFER", Config.ALLOW_FSERV);
             conf.setProperty("PUBLIC-IDENTIFIER", Config.PUBLIC_IDENTIFIER);
             conf.setProperty("NOTICE-IDENTIFIER", Config.NOTICE_IDENTIFIER);
             conf.setProperty("PERMISSIONS-DENIED", Config.PERMISSIONS_DENIED);
-            
             conf.setProperty("NOT-ADMIN", Config.NOT_ADMIN);
             conf.setProperty("DEBUG-MODE", Config.DEBUG_MODE);
             conf.setProperty("ACCEPT-INVITIATIONS", Config.ACCEPT_INVITES);
+            conf.setProperty("LOGGED-CHANNELS", Utils.removeBrackets(LOGGED_CHANS.toString()).replaceAll(",", ""));
             System.out.println("Done Setting propertis!\nSaving!");
             conf.save(cnf);
             System.out.println("Saved!");
