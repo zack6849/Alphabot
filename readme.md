@@ -1,7 +1,13 @@
 Alphabot
 ========
 
-Java irc bot
+Alphabot is an irc utilities bot written in Java with the [PircBotX API](http://code.google.com/p/pircbotx/)  
+Funtions:  
+* fserv capabilities ( **warning: this may get you banned from certain networks, ask a network administrator if it's allowed**)
+* spam detection ( **very** primitive)  
+* can execute java code at runtime
+* custom command framework
+* administrator account settings (checks with nickserv)
 <table>
 <thead>
 <tr>
