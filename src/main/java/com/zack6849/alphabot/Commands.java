@@ -491,12 +491,20 @@ public class Commands {
         String[] args = event.getMessage().split(" ");
         if (args.length <= 2) {
             User user = event.getBot().getUser(args[1]);
-            if (event.getChannel().isOp(user) || Utils.isAdmin(event.getUser().getNick()) || event.getChannel().hasVoice(event.getUser())) {
-                event.getBot().kick(event.getChannel(), user, "Kick requested by " + event.getUser().getNick());
+            User sender = event.getUser();
+            if (event.getChannel().isOp(sender) || Utils.isAdmin(event.getUser().getNick()) || event.getChannel().hasVoice(sender)) {
+                if(!event.getChannel().isOp(user) && !event.getChannel().hasVoice(user)){
+                    event.getBot().kick(event.getChannel(), user, "Kick requested by " + event.getUser().getNick());
+                }else{
+                    event.respond(Config.PERMISSIONS_DENIED);
+                }
+            }else{
+                event.respond(Config.PERMISSIONS_DENIED);
             }
         }
         if (args.length >= 3) {
             User user = event.getBot().getUser(args[1]);
+             User sender = event.getUser();
             if (!event.getChannel().isOp(user) && !event.getChannel().hasVoice(user)) {
                 StringBuilder builder = new StringBuilder();
                 String[] arguments = event.getMessage().split(" ");
@@ -504,7 +512,16 @@ public class Commands {
                     builder.append(arguments[i]).append(" ");
                 }
                 String allArgs = builder.toString().trim();
-                event.getBot().kick(event.getChannel(), user, allArgs);
+                if (event.getChannel().isOp(sender) || Utils.isAdmin(event.getUser().getNick()) || event.getChannel().hasVoice(sender)) {
+                    if (!event.getChannel().isOp(user) && !event.getChannel().hasVoice(user)) {
+                        event.getBot().kick(event.getChannel(), user, allArgs);
+                    }else{
+                        event.respond(Config.PERMISSIONS_DENIED);
+                    }
+                }else{
+                    event.respond(Config.PERMISSIONS_DENIED);
+                }
+                
             }
         }
     }
@@ -617,7 +634,7 @@ public class Commands {
 
     public static void getCommand(MessageEvent event) {
         if (Config.customcmd.containsKey(Bot.curcmd)) {
-            String commandpre = Config.customcmd.getString(event.getMessage().substring(1));
+            String commandpre = Config.customcmd.getString(Bot.curcmd);
             String cmd = Utils.colorEncode(commandpre);
             if (event.getMessage().startsWith(Config.PUBLIC_IDENTIFIER)) {
                 event.getBot().sendMessage(event.getChannel(), cmd);
@@ -637,17 +654,20 @@ public class Commands {
             try {
                 for (int i = 2; i < args.length; i++) {
                     builder.append(args[i]).append(" ");
+                    String s = "\\";
                 }
-                String allargs = builder.toString().trim();
-                if (!def.containsKey(word)) {
-                    def.setProperty(word.toLowerCase(), allargs);
+                
+                String allargs = builder.toString().trim().replaceAll(",", "\\\\,");
+               
+                if (!def.containsKey(word.toLowerCase())) {
+                    def.setProperty(word.toLowerCase(), allargs.replaceAll(",", "\\\\,"));
                 }
-                if (def.containsKey(word)) {
-                    def.clearProperty(word);
-                    def.setProperty(word.toLowerCase(), allargs);
+                if (def.containsKey(word.toLowerCase())) {
+                    def.clearProperty(word.toLowerCase());
+                    def.setProperty(word.toLowerCase(), allargs.replaceAll(",", "\\\\,"));
                 }
                 def.save();
-                event.getBot().sendNotice(event.getUser(), "command " + word + " set to " + Utils.colorEncode(allargs));
+                event.getBot().sendNotice(event.getUser(), "command " + word + " set to " + Utils.colorEncode(allargs.replaceAll("\\\\,", ",")));
             }
             catch (ConfigurationException ex) {
                 Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
