@@ -602,11 +602,13 @@ public class Commands {
             String[] arguments = e.getMessage().split(" ");
             if (arguments.length == 2) {
                 if (Utils.isAdmin(arguments[1])) {
-                    Config.ADMINS.remove(arguments[1]);
                     String admins = "";
                     for (String s : Config.ADMINS) {
-                        admins += s + " ";
+                        if(!s.equalsIgnoreCase(arguments[1])){
+                            admins += s + " ";
+                        }
                     }
+                    Config.ADMINS = Arrays.asList(admins.split(" "));
                     Config.reload();
                     Config.getConfig().refresh();
                     Utils.sendNotice(e.getUser(), arguments[1] + " is no longer an administrator. reloaded the configuration.");
