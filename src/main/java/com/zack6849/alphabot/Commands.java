@@ -601,7 +601,7 @@ public class Commands {
         if (Utils.isAdmin(e.getUser().getNick())) {
             String[] arguments = e.getMessage().split(" ");
             if (arguments.length == 2) {
-                if (!Utils.isAdmin(arguments[1])) {
+                if (Utils.isAdmin(arguments[1])) {
                     Config.ADMINS.remove(arguments[1]);
                     String admins = "";
                     for (String s : Config.ADMINS) {
@@ -609,14 +609,14 @@ public class Commands {
                     }
                     Config.reload();
                     Config.getConfig().refresh();
-                    Utils.sendNotice(e.getUser(), arguments[1] + " is now an administrator. reloaded the configuration.");
+                    Utils.sendNotice(e.getUser(), arguments[1] + " is no longer an administrator. reloaded the configuration.");
                 }
                 else {
-                    Utils.sendNotice(e.getUser(), arguments[1] + " is already an admin!");
+                    Utils.sendNotice(e.getUser(), arguments[1] + " is not an admin!");
                 }
             }
             else {
-                e.getBot().sendNotice(e.getUser(), "Usage: addowner <name>");
+                e.getBot().sendNotice(e.getUser(), "Usage: delowner <name>");
             }
         }
         else {
