@@ -343,7 +343,7 @@ public class Commands {
     }
 
     public static void say(MessageEvent event) {
-        if (Utils.isAdmin(event.getUser().getNick())) {
+        if (Utils.isAdmin(event.getUser().getNick()) || event.getChannel().isOp(event.getUser())) {
             StringBuilder builder = new StringBuilder();
             String[] args = event.getMessage().split(" ");
             for (int i = 1; i < args.length; i++) {
@@ -496,7 +496,7 @@ public class Commands {
             User sender = event.getUser();
             if (event.getChannel().isOp(sender) || Utils.isAdmin(event.getUser().getNick()) || event.getChannel().hasVoice(sender)) {
                 if(!event.getChannel().isOp(user) && !event.getChannel().hasVoice(user)){
-                    event.getBot().kick(event.getChannel(), user, "Kick requested by " + event.getUser().getNick());
+                    event.getBot().kick(event.getChannel(), user, "Surprise train! (Choo choo! -" + event.getUser().getNick() +")");
                 }else{
                     event.respond(Config.PERMISSIONS_DENIED);
                 }
