@@ -86,7 +86,7 @@ public class Utils {
      * All of the wizardy with nickserv caching and logging was done by kingrunes
      */
     public static String getAccount(String user) {
-        synchronized (userNickServMap) //To prevent two threads modifying the list at the same time and causing errors
+        /*synchronized (userNickServMap) //To prevent two threads modifying the list at the same time and causing errors
         {
             if (userLockMap.containsKey(user))
                 synchronized (userLockMap.get(user)){;}
@@ -118,7 +118,8 @@ public class Utils {
             {
                 return userNickServMap.get(user);
             }
-        }
+        }*/
+        return user;
     }
 
     public static List getChannels(User user) {

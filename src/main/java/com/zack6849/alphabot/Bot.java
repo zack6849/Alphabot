@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
+import org.pircbotx.User;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.InviteEvent;
 import org.pircbotx.hooks.events.MessageEvent;
@@ -103,6 +104,7 @@ public class Bot extends ListenerAdapter {
             //System.out.println("Parsing commands!");
             Commands.getCommand(event);
         }
+        
     }
 
     public void parseCommands(MessageEvent event) {

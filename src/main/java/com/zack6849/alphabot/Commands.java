@@ -8,10 +8,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -569,26 +571,29 @@ public class Commands {
         }
     }
 
-    public static void addAdmin(MessageEvent e) throws ConfigurationException, IOException {
-        if (Utils.isAdmin(e.getUser().getNick())) {
+     public static void addAdmin(MessageEvent e) throws ConfigurationException, IOException {
+          if (Utils.isAdmin(e.getUser().getNick())) {
             String[] arguments = e.getMessage().split(" ");
             if (arguments.length == 2) {
                 if (!Utils.isAdmin(arguments[1])) {
-                    Config.ADMINS.add(arguments[1]);
+                   // Config.ADMINS.add(arguments[1]);
+                    String admins = "";
+                    for (String s : Config.ADMINS) {
+                        admins += s + " ";
+                    }
+                    admins += arguments[1];
+                    Config.ADMINS = Arrays.asList(admins.split(" "));
                     Config.reload();
                     Config.getConfig().refresh();
                     Utils.sendNotice(e.getUser(), arguments[1] + " is now an administrator. reloaded the configuration.");
-                }
-                else {
+                } else {
                     Utils.sendNotice(e.getUser(), arguments[1] + " is already an admin!");
                 }
-            }
-            else {
+            } else {
                 e.getBot().sendNotice(e.getUser(), "Usage: addowner <name>");
             }
-        }
-        else {
-           Utils.sendNotice(e.getUser(), perms);
+        } else {
+            Utils.sendNotice(e.getUser(), perms);
         }
     }
 
@@ -809,6 +814,7 @@ public class Commands {
                 interpreter.set("chan", event.getChannel());
                 interpreter.set("user", event.getUser());
                 interpreter.set("utils", utils);
+                
                 StringBuilder builder = new StringBuilder();
                 for (int c = 1; c < args.length; c++) {
                     builder.append(args[c]).append(" ");
