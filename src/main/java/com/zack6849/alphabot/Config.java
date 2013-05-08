@@ -30,9 +30,9 @@ public class Config {
     public static String NOTICE_IDENTIFIER;
     public static String PUBLIC_IDENTIFIER;
     public static String[] CHANS;
-    public static List<String> ADMINS;
-    public static List<String> EXEC_ADMINS;
-    public static List<String> LOGGED_CHANS;
+    public static ArrayList<String> ADMINS;
+    public static ArrayList<String> EXEC_ADMINS;
+    public static ArrayList<String> LOGGED_CHANS;
 
     public static void loadConfig() throws ConfigurationException, IOException {
         conf = new PropertiesConfiguration(cnf);
@@ -89,9 +89,9 @@ public class Config {
         NOTICE_IDENTIFIER = conf.getString("NOTICE-IDENTIFIER");
         PUBLIC_IDENTIFIER = conf.getString("PUBLIC-IDENTIFIER");
         CHANS = conf.getString("CHANNELS").split(" ");
-        ADMINS = Arrays.asList(conf.getString("BOT-ADMINS").split(" "));
-        EXEC_ADMINS = Arrays.asList(conf.getString("EXEC-ADMINS").split(" "));
-        LOGGED_CHANS = Arrays.asList(conf.getString("LOGGED-CHANNELS").split(" "));
+        ADMINS = new ArrayList(Arrays.asList(conf.getString("BOT-ADMINS").split(" ")));
+        EXEC_ADMINS = new ArrayList(Arrays.asList(conf.getString("EXEC-ADMINS").split(" ")));
+        LOGGED_CHANS = new ArrayList(Arrays.asList(conf.getString("LOGGED-CHANNELS").split(" ")));
         SERVER = conf.getString("SERVER");
         ACCEPT_INVITES = conf.getBoolean("ACCEPT-INVITIATIONS");
     }

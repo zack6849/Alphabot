@@ -20,7 +20,6 @@ public class Bot extends ListenerAdapter {
     public static List<String> owners = new ArrayList<String>();
     public static PircBotX bot;
     public static String prefix = "$";
-    private static List<String> allowed;
     public static List<String> ignored = new ArrayList<String>();
     public static List<String> users = new ArrayList<String>();
     public static HashMap<String, Integer> violation = new HashMap<String, Integer>();
@@ -45,7 +44,6 @@ public class Bot extends ListenerAdapter {
             if (Config.IDENTIFY_WITH_NICKSERV) {
                 bot.identify(Config.NICK + " " + Config.PASSWORD);
             }
-            allowed = Config.ADMINS;
             for (String channel : Config.CHANS) {
                 bot.joinChannel(channel);
                 System.out.println("Joined channel " + channel);
@@ -256,7 +254,9 @@ public class Bot extends ListenerAdapter {
         if (command.equalsIgnoreCase("delcmd")) {
             Commands.deleteCommand(event);
         }
-
+        if(command.equalsIgnoreCase("log")){
+            Commands.log(event);
+        }
     }
 
     public String CheckCommand(MessageEvent event) {

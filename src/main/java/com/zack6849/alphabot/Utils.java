@@ -86,7 +86,7 @@ public class Utils {
      * All of the wizardy with nickserv caching and logging was done by kingrunes
      */
     public static String getAccount(String user) {
-        /*synchronized (userNickServMap) //To prevent two threads modifying the list at the same time and causing errors
+        synchronized (userNickServMap) //To prevent two threads modifying the list at the same time and causing errors
         {
             if (userLockMap.containsKey(user))
                 synchronized (userLockMap.get(user)){;}
@@ -118,8 +118,7 @@ public class Utils {
             {
                 return userNickServMap.get(user);
             }
-        }*/
-        return user;
+        }
     }
 
     public static List getChannels(User user) {
@@ -325,7 +324,7 @@ public class Utils {
     public static String colorEncode(String s) {
         return s.replaceAll("color.reset", Colors.NORMAL).replaceAll("color.bold", Colors.BOLD).replaceAll("color.underline", Colors.UNDERLINE).
                 replaceAll("color.reverse", Colors.REVERSE).replaceAll("color.red", Colors.RED).replaceAll("color.green", Colors.GREEN).replaceAll("color.blue", Colors.BLUE).
-                replaceAll("colors.yellow", Colors.YELLOW).replaceAll("colors.cyan", Colors.CYAN).replaceAll("colors.gray", Colors.LIGHT_GRAY);
+                replaceAll("color.yellow", Colors.YELLOW).replaceAll("color.cyan", Colors.CYAN).replaceAll("color.gray", Colors.LIGHT_GRAY);
     }
 
     public static String ping(String host, int port) {

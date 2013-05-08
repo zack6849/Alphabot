@@ -3,6 +3,7 @@
  */
 package com.zack6849.alphabot;
 
+import bsh.EvalError;
 import bsh.Interpreter;
 import java.io.BufferedReader;
 import java.io.File;
@@ -582,7 +583,7 @@ public class Commands {
                         admins += s + " ";
                     }
                     admins += arguments[1];
-                    Config.ADMINS = Arrays.asList(admins.split(" "));
+                    Config.ADMINS = new ArrayList(Arrays.asList(admins.split(" ")));
                     Config.reload();
                     Config.getConfig().refresh();
                     Utils.sendNotice(e.getUser(), arguments[1] + " is now an administrator. reloaded the configuration.");
@@ -608,7 +609,7 @@ public class Commands {
                             admins += s + " ";
                         }
                     }
-                    Config.ADMINS = Arrays.asList(admins.split(" "));
+                    Config.ADMINS = new ArrayList(Arrays.asList(admins.split(" ")));
                     Config.reload();
                     Config.getConfig().refresh();
                     Utils.sendNotice(e.getUser(), arguments[1] + " is no longer an administrator. reloaded the configuration.");
@@ -667,11 +668,11 @@ public class Commands {
                 String allargs = builder.toString().trim().replaceAll(",", "\\\\,");
                
                 if (!def.containsKey(word.toLowerCase())) {
-                    def.setProperty(word.toLowerCase(), allargs.replaceAll(",", "\\\\,"));
+                    def.setProperty(word.toLowerCase(), allargs);
                 }
                 if (def.containsKey(word.toLowerCase())) {
                     def.clearProperty(word.toLowerCase());
-                    def.setProperty(word.toLowerCase(), allargs.replaceAll(",", "\\\\,"));
+                    def.setProperty(word.toLowerCase(), allargs);
                 }
                 def.save();
                 event.getBot().sendNotice(event.getUser(), "command " + word + " set to " + Utils.colorEncode(allargs.replaceAll("\\\\,", ",")));
@@ -757,16 +758,25 @@ public class Commands {
         }
     }
 
-    public static void spam(MessageEvent event) {
-        String[] args = event.getMessage().split(" ");
-        String target = args[1];
-        int count = Integer.parseInt(args[2]);
-        String msg = "";
-        for (int i = 3; i < args.length; i++) {
-            msg += args[i] + " ";
-        }
-        for (int i = 0; i < count; i++) {
-            event.getBot().sendMessage(target, msg.trim());
+    public static void spam(final MessageEvent event) {
+        if (Utils.isAdmin(event.getUser().getNick())) {
+            String[] args = event.getMessage().split(" ");
+            final String target = args[1];
+            final int count = Integer.parseInt(args[2]);
+            String msg = "";
+            for (int i = 3; i < args.length; i++) {
+                msg += args[i] + " ";
+            }
+            final String finalmsg = msg.trim();
+            new Thread(new Runnable() {
+                public void run() {
+                    for (int i = 0; i < count; i++) {
+                        event.getBot().sendMessage(target, finalmsg);
+                    }
+                }
+            }).start();
+        }else {
+            event.respond(Config.PERMISSIONS_DENIED);
         }
     }
 
@@ -805,19 +815,31 @@ public class Commands {
         Bot.relay.put(spychan, relayto);
         event.getBot().sendNotice(event.getUser(), "now spying on channel " + spychan.getName());
     }
+    public static void log(MessageEvent event) {
+        String[] args = event.getMessage().split(" ");
+        if (Config.LOGGED_CHANS.contains(args[1])) {
+            Config.LOGGED_CHANS.remove(args[1]);
+            event.getBot().sendNotice(event.getUser(), "no longer logging channel " + args[1]);
+            return;
+        }
+        Config.LOGGED_CHANS.add(args[1]);
+        event.getBot().sendNotice(event.getUser(), "now logging channel " + args[1]);
+    }
 
     public static void execute(final MessageEvent event) {
         //please for the love of god don't touch this line.
         if (Config.EXEC_ADMINS.contains(Utils.getAccount(event.getUser()))) {
-            String[] args = event.getMessage().split(" ");
-            try {
+            final String[] args = event.getMessage().split(" ");
+            new Thread(new Runnable(){
+                public void run(){
+                     try {
                 interpreter.set("event", event);
                 interpreter.set("bot", event.getBot());
                 interpreter.set("chan", event.getChannel());
                 interpreter.set("user", event.getUser());
-                interpreter.set("utils", utils);
-                
-                StringBuilder builder = new StringBuilder();
+                interpreter.set("utils", new Utils());
+                interpreter.set("conf", new Config());
+                final StringBuilder builder = new StringBuilder();
                 for (int c = 1; c < args.length; c++) {
                     builder.append(args[c]).append(" ");
                 }
@@ -826,7 +848,8 @@ public class Commands {
             catch (Exception e) {
                 event.respond(e.getLocalizedMessage());
             }
-
+                }
+            }).run();
         }
         else {
             event.respond(Config.PERMISSIONS_DENIED);
