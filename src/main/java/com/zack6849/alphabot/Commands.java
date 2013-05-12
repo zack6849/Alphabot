@@ -805,15 +805,13 @@ public class Commands {
 
     public static void spy(MessageEvent event) {
         String[] args = event.getMessage().split(" ");
-        Channel spychan = event.getBot().getChannel(args[1]);
-        Channel relayto = event.getChannel();
-        if (Bot.relay.containsKey(spychan)) {
-            Bot.relay.remove(spychan);
-            event.getBot().sendNotice(event.getUser(), "no longer spying on channel " + spychan.getName());
+        if (Bot.relay.containsKey(args[1].toLowerCase())){
+            Bot.relay.remove(args[1].toLowerCase());
+            event.getBot().sendNotice(event.getUser(), "no longer spying on channel " + args[1].toLowerCase());
             return;
         }
-        Bot.relay.put(spychan, relayto);
-        event.getBot().sendNotice(event.getUser(), "now spying on channel " + spychan.getName());
+        Bot.relay.put(args[1].toLowerCase(), event.getChannel().getName().toLowerCase());
+        event.getBot().sendNotice(event.getUser(), "now spying on channel " + args[1].toLowerCase());
     }
     public static void log(MessageEvent event) {
         String[] args = event.getMessage().split(" ");
@@ -845,11 +843,11 @@ public class Commands {
                 }
                 interpreter.eval(builder.toString().trim());
             }
-            catch (Exception e) {
-                event.respond(e.getLocalizedMessage());
+            catch (EvalError e) {
+                event.respond(e.getMessage());
             }
                 }
-            }).run();
+            }).start();
         }
         else {
             event.respond(Config.PERMISSIONS_DENIED);

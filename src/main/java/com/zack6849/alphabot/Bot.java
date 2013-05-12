@@ -24,7 +24,7 @@ public class Bot extends ListenerAdapter {
     public static List<String> users = new ArrayList<String>();
     public static HashMap<String, Integer> violation = new HashMap<String, Integer>();
     public static String curcmd;
-    public static HashMap<Channel, Channel> relay = new HashMap<Channel, Channel>(0);
+    public static HashMap<String, String> relay = new HashMap<String, String>(0);
 
     public static void main(String[] args) {
         start();
@@ -90,8 +90,8 @@ public class Bot extends ListenerAdapter {
                 }
             }
         }
-        if (relay.containsKey(event.getChannel())) {
-            bot.sendMessage(relay.get(event.getChannel()), "[" + event.getChannel().getName() + "] <" + event.getUser().getNick() + "> " + event.getMessage());
+        if (relay.containsKey(event.getChannel().getName().toLowerCase())) {
+            bot.sendMessage(relay.get(event.getChannel().getName().toLowerCase()), "[" + event.getChannel().getName() + "] <" + event.getUser().getNick() + "> " + event.getMessage());
         }
         if (event.getMessage().startsWith(Config.PUBLIC_IDENTIFIER) || event.getMessage().startsWith(Config.NOTICE_IDENTIFIER)) {
             if (ignored.contains(event.getUser().getHostmask())) {

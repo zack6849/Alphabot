@@ -6,7 +6,6 @@
     <artifactId>Alphabot</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-
     <name>Alphabot</name>
     <url>http://maven.apache.org</url>
     <properties>
