@@ -2,6 +2,7 @@ package com.zack6849.alphabot;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +37,7 @@ public class Bot extends ListenerAdapter {
             Config.loadConfig();
             System.out.println(String.format("=======\nSETTINGS\n======\nBOT-NICKNAME: %s\nBOT-IDENT: %s\nIDENTIFY-WITH-NICKSERV: %s\nVERIFY ADMIN NICKNAMES: %s\nNOTICE IDENTIFIER: %s\nPUBLIC_IDENTIFIER: %s\n======\nSETTINGS\n=======\n\n\n", Config.NICK, Config.IDENT, Config.IDENTIFY_WITH_NICKSERV, Config.VERIFY_ADMIN_NICKS, Config.NOTICE_IDENTIFIER, Config.PUBLIC_IDENTIFIER));
             bot.setLogin("bot");
+            bot.setEncoding(Charset.forName("UTF-8"));
             bot.setName(Config.NICK);
             bot.setVersion("Alphabot v1.5");
             bot.setFinger("oh god what are you doing");

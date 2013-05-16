@@ -387,10 +387,14 @@ public class Commands {
     }
 
     public static void kill(MessageEvent event) {
-        for (Channel channel : event.getBot().getChannels()) {
+        if(Utils.isAdmin(event.getUser().getNick())){
+                    for (Channel channel : event.getBot().getChannels()) {
             event.getBot().sendRawLine("PART " + channel.getName() + " : Killed by " + event.getUser().getNick());
         }
         event.getBot().quitServer();
+        }else{
+            event.respond(Config.PERMISSIONS_DENIED);
+        }
     }
 
     public static void op(MessageEvent event) {
