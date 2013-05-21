@@ -74,15 +74,20 @@ public class Bot extends ListenerAdapter {
             if (Utils.isUrl(words[i]) && !command.contains("shorten") && !words[i].contains("youtube") && !curcmd.contains("setcmd")) {
                 try {
                     title = Utils.getWebpageTitle(words[i]);
-                    String msg = String.format("%s's url title: %s", event.getUser().getNick(), title);
-                    event.getBot().sendMessage(event.getChannel(), msg);
+                    if (!title.isEmpty()) {
+                        if (!title.startsWith("content type:")) {
+                            String msg = String.format("%s's url: %s", event.getUser().getNick(), title);
+                            event.getBot().sendMessage(event.getChannel(), msg);
+                            break;
+                        }
+                        String msg = String.format("%s's url title: %s", event.getUser().getNick(), title);
+                        event.getBot().sendMessage(event.getChannel(), msg);
+                    }
                 }
                 catch (Exception ex1) {
                     ex1.printStackTrace();
                 }
-
             }
-
             if (Utils.isUrl(words[i]) && !command.contains("shorten") && (words[i].toLowerCase().contains("/youtu.be") || words[i].toLowerCase().contains(".youtube.com") || words[i].toLowerCase().contains(".youtu.be") || words[i].toLowerCase().contains("/youtube.com") || words[i].toLowerCase().startsWith("youtube.com") || words[i].toLowerCase().startsWith("youtu.be")) && !command.equalsIgnoreCase("ping")) {
                 try {
                     event.getBot().sendMessage(event.getChannel(), event.getUser().getNick() + "'s youtube link: " + Utils.getYoutubeInfo(words[i]));
@@ -104,7 +109,7 @@ public class Bot extends ListenerAdapter {
             //System.out.println("Parsing commands!");
             Commands.getCommand(event);
         }
-        
+
     }
 
     public void parseCommands(MessageEvent event) {
@@ -113,7 +118,7 @@ public class Bot extends ListenerAdapter {
         if (command.equalsIgnoreCase("cycle")) {
             Commands.cycle(event);
         }
-        if(command.equalsIgnoreCase("google")) {
+        if (command.equalsIgnoreCase("google")) {
             Commands.google(event);
         }
         if (command.equalsIgnoreCase("spam")) {
@@ -259,7 +264,7 @@ public class Bot extends ListenerAdapter {
         if (command.equalsIgnoreCase("delcmd")) {
             Commands.deleteCommand(event);
         }
-        if(command.equalsIgnoreCase("log")){
+        if (command.equalsIgnoreCase("log")) {
             Commands.log(event);
         }
     }
@@ -285,12 +290,14 @@ public class Bot extends ListenerAdapter {
         msg = String.format("%s's url title: %s", event.getUser().getNick(), title);
         return msg;
     }
+
     @Override
     public void onInvite(InviteEvent event) {
         if (Config.ACCEPT_INVITES) {
             event.getBot().joinChannel(event.getChannel());
         }
     }
+
     public void checkSpam(final MessageEvent event) {
         new Thread(new Runnable() {
             @Override
@@ -313,12 +320,12 @@ public class Bot extends ListenerAdapter {
                             violation.put(event.getUser().getNick(), 0);
                             return;
                         }
-                        if(users.contains(event.getUser().getNick())){
-                        event.getBot().setMode(event.getChannel(), "+q ", event.getUser());
-                        users.remove(event.getUser().getNick());
-                        Utils.sendNotice(event.getUser(), "You've been muted temporarily for spam.");
-                        Thread.sleep(1000 * 10);
-                        event.getBot().setMode(event.getChannel(), "-q ", event.getUser());
+                        if (users.contains(event.getUser().getNick())) {
+                            event.getBot().setMode(event.getChannel(), "+q ", event.getUser());
+                            users.remove(event.getUser().getNick());
+                            Utils.sendNotice(event.getUser(), "You've been muted temporarily for spam.");
+                            Thread.sleep(1000 * 10);
+                            event.getBot().setMode(event.getChannel(), "-q ", event.getUser());
                         }
                     }
                 }
