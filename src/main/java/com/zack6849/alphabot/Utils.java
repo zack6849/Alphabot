@@ -4,6 +4,10 @@
  */
 package com.zack6849.alphabot;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -13,6 +17,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
@@ -20,8 +25,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -36,8 +44,6 @@ import org.pircbotx.hooks.events.WhoisEvent;
  * @author zack6849(zcraig29@gmail.com)
  */
 public class Utils {
-    public static String GOOGLE_API_KEY = "";
-
     /**
      * @param user the user object to send the notice too
      * @param notice the string to notice the user with
@@ -54,7 +60,37 @@ public class Utils {
         return s.replaceAll("[\\['']|['\\]'']", "");
         
     }
-
+        public static String google(String s) {
+        try {
+            String temp = String.format("https://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=%s",URLEncoder.encode(s));
+            URL u = new URL(temp);
+            URLConnection c = u.openConnection();
+            System.out.println("url = " + u);
+            c.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.57 Safari/537.17");
+            BufferedReader in = new BufferedReader(new InputStreamReader(c.getInputStream()));
+            String json = "";
+            String tmp = "";
+            while((tmp = in.readLine()) != null){
+                json += tmp + "\n";
+                //System.out.println(tmp);
+            }
+            in.close();
+            Gson gson = new Gson();
+            JsonElement jelement = new JsonParser().parse(json);
+            JsonObject output = jelement.getAsJsonObject();
+            output = output.getAsJsonObject("responseData").getAsJsonArray("results").get(0).getAsJsonObject();
+            String result = String.format("Google: %s | %s | (%s)", StringEscapeUtils.unescapeHtml(output.get("titleNoFormatting").toString().replaceAll("\"", "")), StringEscapeUtils.unescapeHtml(output.get("content").toString().replaceAll("\\s+", " ").replaceAll("\\<.*?>","").replaceAll("\"", "")), output.get("url").toString().replaceAll("\"", ""));
+            
+            if(result != null){
+                return result;
+            }else{
+                return "No results found for query " + s;
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(Utils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
     /**
      * @param user the Minecraft username to check
      * @return returns a boolean depending upon if he username has paid or not

@@ -81,6 +81,21 @@ public class Commands {
             }
         }
     }
+    public static void google(MessageEvent event){
+        String[] args = event.getMessage().split(" ");
+        String prefix = String.valueOf(args[0].charAt(0));
+        String result = "";
+        if(args.length >= 2){
+            for(int i = 1; i < args.length; i++){
+                result += args[i] + " ";
+            }
+            if(prefix.equalsIgnoreCase(Config.NOTICE_IDENTIFIER)){
+                event.getBot().sendNotice(event.getUser(), Utils.google(result.trim()));
+                return;
+            }
+            event.getBot().sendMessage(event.getChannel(), Utils.google(result.trim()));
+        }
+    }
 
     public static void setDelay(MessageEvent event) {
         String[] args = event.getMessage().split(" ");

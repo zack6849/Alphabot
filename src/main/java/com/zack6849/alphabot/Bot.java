@@ -113,6 +113,9 @@ public class Bot extends ListenerAdapter {
         if (command.equalsIgnoreCase("cycle")) {
             Commands.cycle(event);
         }
+        if(command.equalsIgnoreCase("google")) {
+            Commands.google(event);
+        }
         if (command.equalsIgnoreCase("spam")) {
             Commands.spam(event);
         }
@@ -310,11 +313,13 @@ public class Bot extends ListenerAdapter {
                             violation.put(event.getUser().getNick(), 0);
                             return;
                         }
+                        if(users.contains(event.getUser().getNick())){
                         event.getBot().setMode(event.getChannel(), "+q ", event.getUser());
                         users.remove(event.getUser().getNick());
                         Utils.sendNotice(event.getUser(), "You've been muted temporarily for spam.");
                         Thread.sleep(1000 * 10);
                         event.getBot().setMode(event.getChannel(), "-q ", event.getUser());
+                        }
                     }
                 }
                 catch (Exception e) {
