@@ -64,7 +64,7 @@ public class Bot extends ListenerAdapter {
         curcmd = command;
         String title;
         if (!event.getChannel().isOp(event.getUser()) && !event.getChannel().hasVoice(event.getUser())) {
-            checkSpam(event);
+            //checkSpam(event);
         }
         if (ignored.contains(event.getUser().getHostmask())) {
             return;
