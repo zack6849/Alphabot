@@ -311,7 +311,7 @@ public class Utils {
             if (!content.toLowerCase().contains("text/html")) {
                 return "content type: " + content + " size: " + new URL(s).openConnection().getContentLength() / 1024 + "kb";
             }
-            Document doc = Jsoup.connect(s).userAgent("").followRedirects(true).get();
+            Document doc = Jsoup.connect(s).userAgent("Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17").followRedirects(true).get();
             URLConnection c = new URL(s).openConnection();
 
             Elements links = doc.select("title");
