@@ -5,6 +5,7 @@ package com.zack6849.alphabot;
 
 import bsh.EvalError;
 import bsh.Interpreter;
+import bsh.UtilEvalError;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -36,7 +37,19 @@ public class Commands {
     static String perms = Config.PERMISSIONS_DENIED;
     static String password;
     static Utils utils = new Utils();
-
+    static{
+        try {
+            interpreter.getNameSpace().doSuperImport();
+            interpreter.set("utils", new Utils());
+            interpreter.set("conf", new Config());
+        }
+        catch (UtilEvalError ex) {
+            Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (EvalError ex) {
+            Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     public static void shortenUrl(MessageEvent event) {
         String[] args = event.getMessage().split(" ");
         if (args.length == 2) {
@@ -847,24 +860,22 @@ public class Commands {
         //please for the love of god don't touch this line.
         if (Config.EXEC_ADMINS.contains(Utils.getAccount(event.getUser()))) {
             final String[] args = event.getMessage().split(" ");
-            new Thread(new Runnable(){
-                public void run(){
-                     try {
-                interpreter.set("event", event);
-                interpreter.set("bot", event.getBot());
-                interpreter.set("chan", event.getChannel());
-                interpreter.set("user", event.getUser());
-                interpreter.set("utils", new Utils());
-                interpreter.set("conf", new Config());
-                final StringBuilder builder = new StringBuilder();
-                for (int c = 1; c < args.length; c++) {
-                    builder.append(args[c]).append(" ");
-                }
-                interpreter.eval(builder.toString().trim());
-            }
-            catch (EvalError e) {
-                event.respond(e.getMessage());
-            }
+            new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        interpreter.set("event", event);
+                        interpreter.set("bot", event.getBot());
+                        interpreter.set("chan", event.getChannel());
+                        interpreter.set("user", event.getUser());
+                        final StringBuilder builder = new StringBuilder();
+                        for (int c = 1; c < args.length; c++) {
+                            builder.append(args[c]).append(" ");
+                        }
+                        interpreter.eval(builder.toString().trim());
+                    }
+                    catch (Exception e) {
+                        event.respond(e.getMessage());
+                    }
                 }
             }).start();
         }

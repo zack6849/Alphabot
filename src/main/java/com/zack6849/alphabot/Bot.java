@@ -76,11 +76,11 @@ public class Bot extends ListenerAdapter {
                     title = Utils.getWebpageTitle(words[i]);
                     if (!title.isEmpty()) {
                         if (!title.startsWith("content type:")) {
-                            String msg = String.format("%s's url: %s", event.getUser().getNick(), title);
+                            String msg = String.format("%s's url title: %s", event.getUser().getNick(), title);
                             event.getBot().sendMessage(event.getChannel(), msg);
                             break;
                         }
-                        String msg = String.format("%s's url title: %s", event.getUser().getNick(), title);
+                        String msg = String.format("%s's url: %s", event.getUser().getNick(), title);
                         event.getBot().sendMessage(event.getChannel(), msg);
                     }
                 }
