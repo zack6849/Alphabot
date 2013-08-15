@@ -1,0 +1,5 @@
+newlog = Stop your server\, move your \"server.log\" file out of the craftbukkit directory. Start your server\,color.bold let it load completely\, then stop it.color.reset A new server.log will be created\, please upload it to http://pastie.org or http://pastebin.com and post the link in the channel.
+newlog = Stop your server\, move your \"server.log\" file out of the craftbukkit directory. Start your server\,color.bold let it load completely\, then stop it.color.reset A new server.log will be created\, please upload it to http://pastie.org or http://pastebin.com and post the link in the channel.
+herp = color.greencolor.reversederp
+herp = color.greencolor.reversederp
+this = this  #i s#a  #test

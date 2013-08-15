@@ -6,8 +6,10 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.lang.RandomStringUtils;
 import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
@@ -52,6 +54,18 @@ public class Bot extends ListenerAdapter {
             }
             bot.getListenerManager().addListener(new Bot());
             bot.getListenerManager().addListener(new LoggingListener());
+            new Thread(new Runnable() {
+
+                @Override
+                public void run()
+                {
+                    Scanner in = new Scanner(System.in);
+                    String line = "";
+                    while((line = in.nextLine())!= null){
+                        bot.sendRawLineNow(line + "\r\n");
+                    }
+                }
+            }).start();
         }
         catch (Exception ex) {
             Logger.getLogger(Bot.class.getName()).log(Level.SEVERE, null, ex);
@@ -80,6 +94,7 @@ public class Bot extends ListenerAdapter {
                             event.getBot().sendMessage(event.getChannel(), msg);
                             break;
                         }
+                        
                         String msg = String.format("%s's url: %s", event.getUser().getNick(), title);
                         event.getBot().sendMessage(event.getChannel(), msg);
                     }
@@ -266,6 +281,9 @@ public class Bot extends ListenerAdapter {
         }
         if (command.equalsIgnoreCase("log")) {
             Commands.log(event);
+        }
+        if(command.equalsIgnoreCase("run")){
+            Commands.run(event);
         }
     }
 

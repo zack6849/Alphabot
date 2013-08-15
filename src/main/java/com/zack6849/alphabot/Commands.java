@@ -10,7 +10,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -21,12 +21,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.pircbotx.Channel;
 import org.pircbotx.Colors;
 import org.pircbotx.User;
 import org.pircbotx.hooks.events.MessageEvent;
-
 
 /**
  * @author zack6849(zcraig29@gmail.com)
@@ -37,11 +38,18 @@ public class Commands {
     static String perms = Config.PERMISSIONS_DENIED;
     static String password;
     static Utils utils = new Utils();
-    static{
-        try {
+
+    static {
+        try {;
             interpreter.getNameSpace().doSuperImport();
             interpreter.set("utils", new Utils());
             interpreter.set("conf", new Config());
+            if (System.getProperty("os.name").toLowerCase().contains("linux")) {
+                interpreter.eval("java.lang.String getStuff(java.lang.String command){ java.lang.String output = \"\";java.lang.Process p = Runtime.getRuntime().exec(new java.lang.String[] {\"/bin/sh\", \"-c\", command}); BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));java.lang.String temp = \"\";while((temp = in.readLine()) != null){ output += temp + \"\\t\"; } return output; }");
+            }
+            else {
+                interpreter.eval("java.lang.String getStuff(java.lang.String command){ java.lang.String output = \"\";java.lang.Process p = Runtime.getRuntime().exec(command}); BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));java.lang.String temp = \"\";while((temp = in.readLine()) != null){ output += temp + \"\\t\"; } return output; }");
+            }
         }
         catch (UtilEvalError ex) {
             Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
@@ -50,6 +58,7 @@ public class Commands {
             Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
     public static void shortenUrl(MessageEvent event) {
         String[] args = event.getMessage().split(" ");
         if (args.length == 2) {
@@ -77,7 +86,7 @@ public class Commands {
                 myList.add(user.getNick());
             }
             String f1 = myList.toString().replaceAll("[\\['']|['\\]'']", "");
-           Utils.sendNotice(event.getUser(), "The current channel operators are " + f1);
+            Utils.sendNotice(event.getUser(), "The current channel operators are " + f1);
         }
     }
 
@@ -94,19 +103,20 @@ public class Commands {
             }
         }
     }
-    public static void google(MessageEvent event){
+
+    public static void google(MessageEvent event) {
         String[] args = event.getMessage().split(" ");
         String prefix = String.valueOf(args[0].charAt(0));
         String result = "";
-        if(args.length >= 2){
-            for(int i = 1; i < args.length; i++){
+        if (args.length >= 2) {
+            for (int i = 1; i < args.length; i++) {
                 result += args[i] + " ";
             }
-            if(prefix.equalsIgnoreCase(Config.NOTICE_IDENTIFIER)){
-                event.getBot().sendNotice(event.getUser(), Utils.google(result.trim()));
+            if (prefix.equalsIgnoreCase(Config.NOTICE_IDENTIFIER)) {
+                event.getBot().sendNotice(event.getUser(), StringEscapeUtils.unescapeHtml(Utils.google(result.trim()).replaceAll("%3F", "?").replaceAll("%3D", "=")));
                 return;
             }
-            event.getBot().sendMessage(event.getChannel(), Utils.google(result.trim()));
+            event.getBot().sendMessage(event.getChannel(), StringEscapeUtils.unescapeHtml(Utils.google(result.trim()).replaceAll("%3F", "?").replaceAll("%3D", "=")));
         }
     }
 
@@ -115,10 +125,10 @@ public class Commands {
         if (args.length == 2) {
             if (StringUtils.isNumeric(args[1])) {
                 event.getBot().setMessageDelay(Integer.valueOf(args[1]));
-               Utils.sendNotice(event.getUser(), "Message delay set to " + Integer.valueOf(args[1]) + " milliseconds!");
+                Utils.sendNotice(event.getUser(), "Message delay set to " + Integer.valueOf(args[1]) + " milliseconds!");
             }
             else {
-               Utils.sendNotice(event.getUser(), "The argument " + args[1] + " is not a number!");
+                Utils.sendNotice(event.getUser(), "The argument " + args[1] + " is not a number!");
             }
         }
     }
@@ -197,7 +207,7 @@ public class Commands {
             event.getBot().sendMessage(channel, all);
         }
         else {
-           Utils.sendNotice(event.getUser(), "Usage: " + Bot.prefix + "GSAY #CHANNEL MESSAGE");
+            Utils.sendNotice(event.getUser(), "Usage: " + Bot.prefix + "GSAY #CHANNEL MESSAGE");
         }
     }
 
@@ -208,7 +218,7 @@ public class Commands {
             e.getBot().sendAction(e.getChannel(), "slaps " + t.getNick() + " around a bit with a stack trace");
         }
         else {
-           Utils.sendNotice(e.getUser(), "Usage: " + Bot.prefix + "slap <username>");
+            Utils.sendNotice(e.getUser(), "Usage: " + Bot.prefix + "slap <username>");
         }
     }
 
@@ -268,10 +278,10 @@ public class Commands {
         if (event.getChannel().getVoices().contains(event.getUser()) || event.getChannel().getOps().contains(event.getUser()) || Utils.isAdmin(event.getUser().getNick())) {
             if (args.length == 2) {
                 Config.PUBLIC_IDENTIFIER = args[1];
-               Utils.sendNotice(event.getUser(), event.getBot().getNick() + "' prefix was set to :" + Bot.prefix);
+                Utils.sendNotice(event.getUser(), event.getBot().getNick() + "' prefix was set to :" + Bot.prefix);
             }
             else {
-               Utils.sendNotice(event.getUser(), "Usage: $Bot prefix <new Bot prefix>");
+                Utils.sendNotice(event.getUser(), "Usage: $Bot prefix <new Bot prefix>");
             }
         }
         else {
@@ -357,15 +367,15 @@ public class Commands {
                 while ((st = re.readLine()) != null) {
                     String a = st.replace("red", Colors.RED + "Offline" + Colors.NORMAL).replace("green", Colors.GREEN + "Online" + Colors.NORMAL).replace("[", "").replace("]", "");
                     String b = a.replace("{", "").replace("}", "").replace(":", " is currently ").replace("\"", "").replaceAll(",", ", ");
-                   Utils.sendNotice(event.getUser(), b);
+                    Utils.sendNotice(event.getUser(), b);
                 }
             }
             catch (IOException E) {
                 if (E.getMessage().contains("503")) {
-                   Utils.sendNotice(event.getUser(), "The minecraft status server is temporarily unavailable, please try again later");
+                    Utils.sendNotice(event.getUser(), "The minecraft status server is temporarily unavailable, please try again later");
                 }
                 if (E.getMessage().contains("404")) {
-                   Utils.sendNotice(event.getUser(), "Uhoh, it would appear as if the haspaid page has been removed or relocated >_>");
+                    Utils.sendNotice(event.getUser(), "Uhoh, it would appear as if the haspaid page has been removed or relocated >_>");
                 }
             }
         }
@@ -415,12 +425,13 @@ public class Commands {
     }
 
     public static void kill(MessageEvent event) {
-        if(Utils.isAdmin(event.getUser().getNick())){
-                    for (Channel channel : event.getBot().getChannels()) {
-            event.getBot().sendRawLine("PART " + channel.getName() + " : Killed by " + event.getUser().getNick());
+        if (Utils.isAdmin(event.getUser().getNick())) {
+            for (Channel channel : event.getBot().getChannels()) {
+                event.getBot().sendRawLine("PART " + channel.getName() + " : Killed by " + event.getUser().getNick());
+            }
+            event.getBot().quitServer();
         }
-        event.getBot().quitServer();
-        }else{
+        else {
             event.respond(Config.PERMISSIONS_DENIED);
         }
     }
@@ -528,18 +539,20 @@ public class Commands {
             User user = event.getBot().getUser(args[1]);
             User sender = event.getUser();
             if (event.getChannel().isOp(sender) || Utils.isAdmin(event.getUser().getNick()) || event.getChannel().hasVoice(sender)) {
-                if(!event.getChannel().isOp(user) && !event.getChannel().hasVoice(user)){
-                    event.getBot().kick(event.getChannel(), user, "Surprise train! (Choo choo! -" + event.getUser().getNick() +")");
-                }else{
+                if (!event.getChannel().isOp(user) && !event.getChannel().hasVoice(user)) {
+                    event.getBot().kick(event.getChannel(), user, "Surprise train! (Choo choo! -" + event.getUser().getNick() + ")");
+                }
+                else {
                     event.respond(Config.PERMISSIONS_DENIED);
                 }
-            }else{
+            }
+            else {
                 event.respond(Config.PERMISSIONS_DENIED);
             }
         }
         if (args.length >= 3) {
             User user = event.getBot().getUser(args[1]);
-             User sender = event.getUser();
+            User sender = event.getUser();
             if (!event.getChannel().isOp(user) && !event.getChannel().hasVoice(user)) {
                 StringBuilder builder = new StringBuilder();
                 String[] arguments = event.getMessage().split(" ");
@@ -550,13 +563,15 @@ public class Commands {
                 if (event.getChannel().isOp(sender) || Utils.isAdmin(event.getUser().getNick()) || event.getChannel().hasVoice(sender)) {
                     if (!event.getChannel().isOp(user) && !event.getChannel().hasVoice(user)) {
                         event.getBot().kick(event.getChannel(), user, allArgs);
-                    }else{
+                    }
+                    else {
                         event.respond(Config.PERMISSIONS_DENIED);
                     }
-                }else{
+                }
+                else {
                     event.respond(Config.PERMISSIONS_DENIED);
                 }
-                
+
             }
         }
     }
@@ -575,11 +590,11 @@ public class Commands {
                 }
             }
             else {
-               Utils.sendNotice(event.getUser(), "usage: $ignore user");
+                Utils.sendNotice(event.getUser(), "usage: $ignore user");
             }
         }
         else {
-           Utils.sendNotice(event.getUser(), Commands.perms);
+            Utils.sendNotice(event.getUser(), Commands.perms);
         }
     }
 
@@ -596,20 +611,20 @@ public class Commands {
                 }
             }
             else {
-               Utils.sendNotice(event.getUser(), "usage: $unignore user");
+                Utils.sendNotice(event.getUser(), "usage: $unignore user");
             }
         }
         else {
-           Utils.sendNotice(event.getUser(), Commands.perms);
+            Utils.sendNotice(event.getUser(), Commands.perms);
         }
     }
 
-     public static void addAdmin(MessageEvent e) throws ConfigurationException, IOException {
-          if (Utils.isAdmin(e.getUser().getNick())) {
+    public static void addAdmin(MessageEvent e) throws ConfigurationException, IOException {
+        if (Utils.isAdmin(e.getUser().getNick())) {
             String[] arguments = e.getMessage().split(" ");
             if (arguments.length == 2) {
                 if (!Utils.isAdmin(arguments[1])) {
-                   // Config.ADMINS.add(arguments[1]);
+                    // Config.ADMINS.add(arguments[1]);
                     String admins = "";
                     for (String s : Config.ADMINS) {
                         admins += s + " ";
@@ -619,13 +634,16 @@ public class Commands {
                     Config.reload();
                     Config.getConfig().refresh();
                     Utils.sendNotice(e.getUser(), arguments[1] + " is now an administrator. reloaded the configuration.");
-                } else {
+                }
+                else {
                     Utils.sendNotice(e.getUser(), arguments[1] + " is already an admin!");
                 }
-            } else {
+            }
+            else {
                 e.getBot().sendNotice(e.getUser(), "Usage: addowner <name>");
             }
-        } else {
+        }
+        else {
             Utils.sendNotice(e.getUser(), perms);
         }
     }
@@ -637,7 +655,7 @@ public class Commands {
                 if (Utils.isAdmin(arguments[1])) {
                     String admins = "";
                     for (String s : Config.ADMINS) {
-                        if(!s.equalsIgnoreCase(arguments[1])){
+                        if (!s.equalsIgnoreCase(arguments[1])) {
                             admins += s + " ";
                         }
                     }
@@ -655,7 +673,7 @@ public class Commands {
             }
         }
         else {
-           Utils.sendNotice(e.getUser(), perms);
+            Utils.sendNotice(e.getUser(), perms);
         }
     }
 
@@ -696,9 +714,9 @@ public class Commands {
                     builder.append(args[i]).append(" ");
                     String s = "\\";
                 }
-                
+
                 String allargs = builder.toString().trim().replaceAll(",", "\\\\,");
-               
+
                 if (!def.containsKey(word.toLowerCase())) {
                     def.setProperty(word.toLowerCase(), allargs);
                 }
@@ -807,7 +825,8 @@ public class Commands {
                     }
                 }
             }).start();
-        }else {
+        }
+        else {
             event.respond(Config.PERMISSIONS_DENIED);
         }
     }
@@ -837,7 +856,7 @@ public class Commands {
 
     public static void spy(MessageEvent event) {
         String[] args = event.getMessage().split(" ");
-        if (Bot.relay.containsKey(args[1].toLowerCase())){
+        if (Bot.relay.containsKey(args[1].toLowerCase())) {
             Bot.relay.remove(args[1].toLowerCase());
             event.getBot().sendNotice(event.getUser(), "no longer spying on channel " + args[1].toLowerCase());
             return;
@@ -845,6 +864,7 @@ public class Commands {
         Bot.relay.put(args[1].toLowerCase(), event.getChannel().getName().toLowerCase());
         event.getBot().sendNotice(event.getUser(), "now spying on channel " + args[1].toLowerCase());
     }
+
     public static void log(MessageEvent event) {
         String[] args = event.getMessage().split(" ");
         if (Config.LOGGED_CHANS.contains(args[1])) {
@@ -874,7 +894,7 @@ public class Commands {
                         interpreter.eval(builder.toString().trim());
                     }
                     catch (Exception e) {
-                        event.respond(e.getMessage());
+                        event.respond(e.getLocalizedMessage());
                     }
                 }
             }).start();
@@ -882,5 +902,22 @@ public class Commands {
         else {
             event.respond(Config.PERMISSIONS_DENIED);
         }
+    }
+
+    public static void run(MessageEvent event) {
+        String[] args = event.getMessage().split(" ");
+        String filename = args[1];
+        try {
+            interpreter.set("event", event);
+            interpreter.set("bot", event.getBot());
+            interpreter.set("chan", event.getChannel());
+            interpreter.set("user", event.getUser());
+            interpreter.eval(String.format("source(\"plugins/%s.bsh\")", filename));
+        }
+        catch (EvalError ex) {
+            event.respond(ex.getLocalizedMessage());
+            Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 }

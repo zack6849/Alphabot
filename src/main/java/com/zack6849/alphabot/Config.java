@@ -119,6 +119,7 @@ public class Config {
             conf.setProperty("ALLOW-FILE-TRANSFER", Config.ALLOW_FSERV);
             conf.setProperty("PUBLIC-IDENTIFIER", Config.PUBLIC_IDENTIFIER);
             conf.setProperty("NOTICE-IDENTIFIER", Config.NOTICE_IDENTIFIER);
+            
             conf.setProperty("PERMISSIONS-DENIED", Config.PERMISSIONS_DENIED);
             conf.setProperty("NOT-ADMIN", Config.NOT_ADMIN);
             conf.setProperty("DEBUG-MODE", Config.DEBUG_MODE);

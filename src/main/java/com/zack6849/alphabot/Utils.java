@@ -62,7 +62,7 @@ public class Utils {
     }
         public static String google(String s) {
         try {
-            String temp = String.format("https://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=%s",URLEncoder.encode(s));
+            String temp = String.format("https://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=%s", URLEncoder.encode(s));
             URL u = new URL(temp);
             URLConnection c = u.openConnection();
             System.out.println("url = " + u);
@@ -70,7 +70,7 @@ public class Utils {
             BufferedReader in = new BufferedReader(new InputStreamReader(c.getInputStream()));
             String json = "";
             String tmp = "";
-            while((tmp = in.readLine()) != null){
+            while ((tmp = in.readLine()) != null) {
                 json += tmp + "\n";
                 //System.out.println(tmp);
             }
@@ -79,14 +79,16 @@ public class Utils {
             JsonElement jelement = new JsonParser().parse(json);
             JsonObject output = jelement.getAsJsonObject();
             output = output.getAsJsonObject("responseData").getAsJsonArray("results").get(0).getAsJsonObject();
-            String result = String.format("Google: %s | %s | (%s)", StringEscapeUtils.unescapeHtml(output.get("titleNoFormatting").toString().replaceAll("\"", "")), StringEscapeUtils.unescapeHtml(output.get("content").toString().replaceAll("\\s+", " ").replaceAll("\\<.*?>","").replaceAll("\"", "")), output.get("url").toString().replaceAll("\"", ""));
-            
-            if(result != null){
+            String result = String.format("Google: %s | %s | (%s)", StringEscapeUtils.unescapeHtml(output.get("titleNoFormatting").toString().replaceAll("\"", "")), StringEscapeUtils.unescapeHtml(output.get("content").toString().replaceAll("\\s+", " ").replaceAll("\\<.*?>", "").replaceAll("\"", "")), output.get("url").toString().replaceAll("\"", ""));
+
+            if (result != null) {
                 return result;
-            }else{
+            }
+            else {
                 return "No results found for query " + s;
             }
-        } catch (IOException ex) {
+        }
+        catch (IOException ex) {
             Logger.getLogger(Utils.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
@@ -258,7 +260,6 @@ public class Utils {
             MessageDigest alg = MessageDigest.getInstance("SHA-512");
             alg.reset();
             alg.update(s.getBytes(Charset.forName("UTF-8")));
-
             byte[] digest = alg.digest();
             for (byte b : digest) {
                 sb.append(Integer.toHexString(0xFF & b));
