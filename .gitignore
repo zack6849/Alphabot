@@ -9,7 +9,6 @@
 # various other potential build files
 /build
 /bin
-/dist
 /manifest.mf
 #ignore the auto-generated config.
 /conf
